@@ -61,6 +61,13 @@ nav.navbar.scrolled {
 nav.navbar a.navbar-brand {
     width: 9%;
 }
+
+nav.navbar .navbar-brand img{
+    width: 60%;
+    height: 10%;
+    filter: brightness(0) invert(1);
+}
+
 nav.navbar .nav-link.navbar-link {
   font-weight: 400;
   color: #fff !important;
@@ -69,10 +76,11 @@ nav.navbar .nav-link.navbar-link {
   font-size: 18px;
   opacity: 0.75;
 }
-nav.navbar  a.nav-link.navbar-link:hover,
-nav.navbar  a.nav-link.navbar-link.active {
+nav.navbar  .nav-link.navbar-link:hover,
+nav.navbar  .nav-link.act.navbar-link {
     opacity: 1;
 }
+
 span.navbar-text {
     display: flex;
     align-items: center;
@@ -118,7 +126,7 @@ span.navbar-text {
   font-weight: 700;
   color: #fff;
   border: 1px solid #fff;
-  padding: 18px 34px;
+  padding: 18px 18px;
   font-size: 18px;
   margin-left: 18px;
 	position: relative;
