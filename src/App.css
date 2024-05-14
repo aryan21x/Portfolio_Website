@@ -58,14 +58,20 @@ nav.navbar.scrolled {
   padding: 0px 0;
   background-color: #121212;
 }
-nav.navbar a.navbar-brand {
-    width: 9%;
+nav.navbar .navbar-brand {
+    width: 10%;
+    transition: 0.3s ease-in-out;
 }
 
 nav.navbar .navbar-brand img{
-    width: 60%;
+    width: 50%;
     height: 10%;
     filter: brightness(0) invert(1);
+    transition: width 0.3s ease-in-out;
+}
+
+.navbar .navbar-brand:hover img {
+  width: 55%;
 }
 
 nav.navbar .nav-link.navbar-link {
@@ -100,6 +106,7 @@ span.navbar-text {
     justify-content: center;
     line-height: 1;
     border: 1px solid rgba(255, 255, 255, 0.5);
+    color: white;
 }
 .social-icon a::before {
     content: "";
@@ -109,11 +116,12 @@ span.navbar-text {
     background-color: #ffffff;
     border-radius: 50%;
     transform: scale(0);
-	transition: 0.3s ease-in-out;
+	  transition: 0.3s ease-in-out;
 }
 .social-icon a:hover::before {
     transform: scale(1);
 }
+
 .social-icon a img {
 	width: 40%;
 	z-index: 1;
@@ -122,11 +130,16 @@ span.navbar-text {
 .social-icon a:hover img {
 	filter: brightness(0) saturate(100%) invert(0%) sepia(7%) saturate(98%) hue-rotate(346deg) brightness(95%) contrast(86%);
 }
+
+.social-icon a:hover .colorChange {
+	color: black;
+  z-index: 999;
+}
 .navbar-text button {
   font-weight: 700;
   color: #fff;
   border: 1px solid #fff;
-  padding: 18px 18px;
+  padding: 8px 18px;
   font-size: 18px;
   margin-left: 18px;
 	position: relative;
@@ -200,4 +213,12 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon:before {
 }
 nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 	border-color: transparent;
+}
+
+
+@media (max-width: 768px) {
+  nav.navbar .navbar-brand {
+      width: 30%;
+      height: auto;
+  }
 }
