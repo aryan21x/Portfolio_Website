@@ -53,9 +53,9 @@ const CustomNavbar = () => {
             </Nav>
           <span className="navbar-text">
               <div className="social-icon">
-                <a href="#"><FontAwesomeIcon icon={faGithub} className="colorChange"/></a>
-                <a href="#"><FontAwesomeIcon icon={faLinkedin} className="colorChange"/></a>
-                <a href="#"><FontAwesomeIcon icon={faInstagram} className="colorChange"/></a>
+                <a href="https://github.com/aryan21x" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faGithub} className="colorChange"/></a>
+                <a href="https://www.linkedin.com/in/aryanraval/" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faLinkedin} className="colorChange"/></a>
+                <a href="https://www.instagram.com/aryan.21x_" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faInstagram} className="colorChange"/></a>
               </div>
               <button className="vvd" onClick={() => console.log('connect')}> <span>Let's Connect</span></button>
           </span>
