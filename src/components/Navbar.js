@@ -10,7 +10,7 @@ const CustomNavbar = () => {
 
   useEffect( () => {
     const onScroll = () => {
-      if (window.scrollY > 50) {
+      if (window.scrollY > 100) {
         seScrolled(true);
       } else{
         seScrolled(false);
@@ -38,14 +38,14 @@ const CustomNavbar = () => {
           crossorigin="anonymous" referrerpolicy="no-referrer" />
       </head>
       <Navbar expand="lg" className={scrolled ? "scrolled": ""}>  {/* change to lg */}
-        <Container>
+        <Container fluid>
           <Navbar.Brand href="#home" onClick={ () => onLogoClick()}>
               <img src={logo} alt="logo" />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav">
               <span className="navbar-toggler-icon"></span>
           </Navbar.Toggle>
-          <Navbar.Collapse id="basic-navbar-nav">
+          <Navbar.Collapse id="basic-navbar-nav" className="backgroundBlack">
             <Nav className="ms-auto">
               <Nav.Link href="#home" className={activeLink === 'home' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('home')} >Home</Nav.Link>
               <Nav.Link href="#about" className={activeLink === 'about' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('about')} >About</Nav.Link>
