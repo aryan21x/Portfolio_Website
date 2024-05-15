@@ -7,19 +7,22 @@ import { faInstagram, faGithub, faLinkedin } from '@fortawesome/free-brands-svg-
 const CustomNavbar = () => {
   const [activeLink, setActiveLink] = useState('home');
   const [scrolled, seScrolled] = useState(false);
+  
 
   useEffect( () => {
     const onScroll = () => {
-      if (window.scrollY > 100) {
-        seScrolled(true);
-      } else{
-        seScrolled(false);
-      }
+      if(window.innerWidth > 768) {
+          if (window.scrollY > 100) {
+            seScrolled(true);
+          } else{
+            seScrolled(false);
+          }
+        }
     }
     window.addEventListener("scroll", onScroll);
-    
     return () => window.removeEventListener("scroll", onScroll);
   }, [])
+
 
   const onUpdateActive = (value) => {
     setActiveLink(value);
@@ -27,6 +30,10 @@ const CustomNavbar = () => {
 
   const onLogoClick = () => {
     setActiveLink('home');
+  }
+
+  const Toggler = () => {
+    seScrolled(!scrolled);
   }
 
   return (
@@ -42,15 +49,15 @@ const CustomNavbar = () => {
           <Navbar.Brand href="#home" onClick={ () => onLogoClick()}>
               <img src={logo} alt="logo" />
           </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav">
+          <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={ () => Toggler()}>
               <span className="navbar-toggler-icon"></span>
           </Navbar.Toggle>
-          <Navbar.Collapse id="basic-navbar-nav" className="backgroundBlack">
+          <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
-              <Nav.Link href="#home" className={activeLink === 'home' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('home')} >Home</Nav.Link>
+              <Nav.Link href="#home" className={activeLink === 'home' ? 'act2 navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('home')} >Home</Nav.Link>
               <Nav.Link href="#about" className={activeLink === 'about' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('about')} >About</Nav.Link>
               <Nav.Link href="#skills" className={activeLink === 'skills' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('skills')} >Skills</Nav.Link>
-              <Nav.Link href="#projects" className={activeLink === 'projects' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('projects')} >Projects</Nav.Link>
+              <Nav.Link href="#projects"  className={activeLink === 'projects' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('projects')} >Projects</Nav.Link>
             </Nav>
           <span className="navbar-text">
               <div className="social-icon">
