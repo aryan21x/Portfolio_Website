@@ -48,6 +48,7 @@ const CustomNavbar = () => {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
               <Nav.Link href="#home" className={activeLink === 'home' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('home')} >Home</Nav.Link>
+              <Nav.Link href="#about" className={activeLink === 'about' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('about')} >About</Nav.Link>
               <Nav.Link href="#skills" className={activeLink === 'skills' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('skills')} >Skills</Nav.Link>
               <Nav.Link href="#projects" className={activeLink === 'projects' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('projects')} >Projects</Nav.Link>
             </Nav>

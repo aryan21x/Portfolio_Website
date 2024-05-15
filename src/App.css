@@ -218,7 +218,7 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 /************ Banner Css ************/
 .banner {
   margin-top: 0;
-  padding: 260px 0 100px 0;
+  padding: 100px 0 100px 0;
   background-image: url('./assets/img/banner-bg.png');
   background-position: top center;
   background-size: cover;
@@ -251,9 +251,10 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 }
 .banner button {
   color: #fff;
+  background-color: transparent;
+  border: none;
   font-weight: 700;
   font-size: 20px;
-  margin-top: 60px;
   letter-spacing: 0.8px;
   display: flex;
   align-items: center;
@@ -290,5 +291,29 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   nav.navbar .navbar-brand {
       width: 30%;
       height: auto;
+  }
+
+  nav.navbar .toggle{
+      z-index: 999;
+  }
+  .banner .tagline{
+    margin-top: 160px;
+  }
+
+  .banner img{
+    max-width: 100%;
+    height: auto;
+    max-height: 200px; /* Set maximum height */
+    position: absolute;
+    top: 10%;
+    right: 10%;
+  }
+
+  .banner h1 {
+    font-size: 40px;
+  }
+  .banner p {
+    font-size: 15px;
+    display: none;
   }
 }

@@ -48,8 +48,9 @@ const Banner = () => {
                     <Col xs={12} md={6} xl={7}>
                         <span className="tagline"> Welcome to my Portfolio</span>
                         <h1>{`Hi I'm Aryan Raval `}<span className="wrap">{text}</span></h1>
-                        <p> Some para about myself</p>
-                        <button onClick={()=> console.log('connect')}> Let's connect</button>
+                        <p> Computer Science major at South Dakota School of Mines</p>
+                        <p> Always ready to learn.</p>
+                        <button onClick={()=> console.log('connect')}> Let's connect <ArrowRightCircle size={25} /></button>
                     </Col>
                     <Col xs={12} md={6} xl={5}>
                         <img src={headerImg} alt="Header Img" />
