@@ -11,7 +11,6 @@ const Banner = () => {
     const [delta, setDelta] = useState(300 - Math.random() * 100);
     const period = 2000;
 
-    
     const tick = () => {
         let i = loopNum % toRotate.length;
         let fullText = toRotate[i];
@@ -39,7 +38,8 @@ const Banner = () => {
         }, delta)
 
         return () => { clearInterval(ticker)};
-    } , [text,delta,tick])
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    } , [text])
 
 
     return (

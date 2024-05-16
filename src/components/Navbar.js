@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram, faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
 
 const CustomNavbar = () => {
-  const [activeLink, setActiveLink] = useState('home');
+  // const [activeLink, setActiveLink] = useState('home');
   const [scrolled, seScrolled] = useState(false);
   const [scrolledHome, seScrolledHome] = useState(true);
   const [scrolledAbout,seScrolledAbout] = useState(false);
@@ -85,13 +85,13 @@ const CustomNavbar = () => {
 
 
 
-  const onUpdateActive = (value) => {
-    setActiveLink(value);
-  }
+  // const onUpdateActive = (value) => {
+  //   setActiveLink(value);
+  // }
 
-  const onLogoClick = () => {
-    setActiveLink('home');
-  }
+  // const onLogoClick = () => {
+  //   setActiveLink('home');
+  // }
 
   const Toggler = () => {
     seScrolled(!scrolled);
@@ -107,7 +107,7 @@ const CustomNavbar = () => {
       </head>
       <Navbar expand="lg" className={scrolled ? "scrolled": ""}>  {/* change to lg */}
         <Container fluid>
-          <Navbar.Brand href="#home" onClick={ () => onLogoClick()}>
+          <Navbar.Brand href="#home">
               <img src={logo} alt="logo" />
           </Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={ () => Toggler()}>
@@ -115,10 +115,10 @@ const CustomNavbar = () => {
           </Navbar.Toggle>
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
-              <Nav.Link href="#home" className={('navbar-link') + (scrolledHome ? " hoveredH" : "")} onClick={ () => onUpdateActive('home')} >Home</Nav.Link>
-              <Nav.Link href="#about" className={('navbar-link') + (scrolledAbout ? " hovered" : "")} onClick={ () => onUpdateActive('about')} >About</Nav.Link>
-              <Nav.Link href="#skills" className={('navbar-link') + (scrolledSkills ? " hovered" : "")} onClick={ () => onUpdateActive('skills')} >Skills</Nav.Link>
-              <Nav.Link href="#projects"  className={('navbar-link') + (scrolledProjects ? " hovered" : "")} onClick={ () => onUpdateActive('projects')} >Projects</Nav.Link>
+              <Nav.Link href="#home" className={('navbar-link') + (scrolledHome ? " hoveredH" : "")}  >Home</Nav.Link>
+              <Nav.Link href="#about" className={('navbar-link') + (scrolledAbout ? " hovered" : "")}  >About</Nav.Link>
+              <Nav.Link href="#skills" className={('navbar-link') + (scrolledSkills ? " hovered" : "")} >Skills</Nav.Link>
+              <Nav.Link href="#projects"  className={('navbar-link') + (scrolledProjects ? " hovered" : "")} >Projects</Nav.Link>
             </Nav>
           <span className="navbar-text">
               <div className="social-icon">
