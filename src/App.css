@@ -298,6 +298,7 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 }
 .skill-bx {
   background: #151515;
+  background: #10011c;
   border-radius: 64px;
   text-align: center;
   padding: 60px 50px;
@@ -331,7 +332,15 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   z-index: -4;
 }
 
+.skill-slider .resize img{
+  width: 100%;
+  height: auto;
+  max-height: 160px;
+}
 
+.skill-slider .recolor img{
+  filter: brightness(0) invert(1);
+}
 /******** Only Destop Screens ********/
 @media (min-width: 868px){
   nav.navbar .navbar-brand {
