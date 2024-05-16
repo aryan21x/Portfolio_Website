@@ -347,11 +347,12 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 .about {
   position: relative;
   padding: 60px 0;
-  background-image: url('./assets/img/about-bg4.jpg');
+  background-image:url('./assets/img/about-bg4.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   height: 100vh;
+  color: #10011c;
 }
 
 
@@ -360,13 +361,9 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   width: 400px; 
   height: 400px; 
   object-fit: cover;
-  /* left: 300px;
-  top: 100px;
-  position: absolute; */
 }
 
 .about h1{
-  color: #10011c;
   font-size: 80px;
   font-weight: 700;
 }
@@ -374,13 +371,26 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 .about .align-items-center p{
   font-size: 20px;
 	font-weight: 500;
-  color: #10011c;
 }
 
-.about .align-items-center{
-  /* left: 750px;
-  top: 130px;
-  position: absolute; */
+.about .SecondPara {
+  font-size: 25px !important;
+	font-weight: 400;
+}
+
+.about .resume-link {
+  color: #b400ff; 
+  text-decoration: none; 
+  font-weight: 700; 
+  padding: 10px 20px; 
+  border: 2px solid #b400ff; 
+  border-radius: 5px; 
+  transition: background-color 0.3s, color 0.3s; 
+}
+
+.about .resume-link:hover {
+  background-color: #b400ff; 
+  color: #fff;
 }
 
 
@@ -417,6 +427,15 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
     nav.navbar  .nav-link.act2.navbar-link {
     opacity: 1;
     color: #fff !important;
+    }
+
+    .about  img {
+      border-radius: 50%;
+      width: 400px; 
+      height: 400px; 
+      object-fit: cover;
+      left: 300px;
+      position: absolute;
     }
     
 }
@@ -467,5 +486,33 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   }
   .banner p {
     font-size: 15px;
+  }
+
+  .about  img {
+    border-radius: 50%;
+    width: 150px; 
+    height: 150px; 
+    object-fit: cover;
+  }
+
+  .about h1{
+    font-size: 40px;
+    font-weight: 700;
+  }
+  
+  .about .align-items-center p{
+    font-size: 10px;
+    font-weight: 500;
+  }
+  
+  .about .SecondPara {
+    font-size: 15px !important;
+    font-weight: 400;
+  }
+
+  .about .resume-link {
+    position: absolute;
+    left: 10%;
+    top: 40%;
   }
 }
