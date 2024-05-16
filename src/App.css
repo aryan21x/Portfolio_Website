@@ -74,13 +74,13 @@ nav.navbar .navbar-brand img{
 
 nav.navbar .nav-link.navbar-link {
   font-weight: 400;
-  color: #fff !important;
+  color: #fff ;
   letter-spacing: 0.8px;
   padding: 0 25px;
   font-size: 18px;
   opacity: 0.65;
 }
-nav.navbar  .nav-link.navbar-link:hover,
+nav.navbar  .nav-link.act.navbar-link:hover,
 nav.navbar  .nav-link.act.navbar-link {
     opacity: 1;
     color: #b400ff !important;
@@ -112,7 +112,7 @@ span.navbar-text {
     width: 42px;
     height: 42px;
     position: absolute;
-    background-color: #b400ff;
+    background-color: #fff;
     border-radius: 50%;
     transform: scale(0);
 	  transition: 0.3s ease-in-out;
@@ -132,7 +132,7 @@ span.navbar-text {
 }
 
 .social-icon a:hover .colorChange {
-	color: #fff;
+	color: #b400ff;
   z-index: 999;
 }
 
@@ -164,7 +164,7 @@ span.navbar-text {
   transition: 0.3s ease-in-out;
 }
 .navbar-text button:hover {
-  color: #121212;
+  color: #fff;
 }
 .navbar-text button:hover::before {
 	content: "";
@@ -297,7 +297,6 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
   position: relative;
 }
 .skill-bx {
-  background: #151515;
   background: #10011c;
   border-radius: 64px;
   text-align: center;
@@ -341,6 +340,50 @@ nav.navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
 .skill-slider .recolor img{
   filter: brightness(0) invert(1);
 }
+
+
+/************ About Css ************/
+
+.about {
+  position: relative;
+  padding: 60px 0;
+  background-image: url('./assets/img/about-bg4.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+}
+
+
+.about  img {
+  border-radius: 50%;
+  width: 400px; 
+  height: 400px; 
+  object-fit: cover;
+  /* left: 300px;
+  top: 100px;
+  position: absolute; */
+}
+
+.about h1{
+  color: #10011c;
+  font-size: 80px;
+  font-weight: 700;
+}
+
+.about .align-items-center p{
+  font-size: 20px;
+	font-weight: 500;
+  color: #10011c;
+}
+
+.about .align-items-center{
+  /* left: 750px;
+  top: 130px;
+  position: absolute; */
+}
+
+
 /******** Only Destop Screens ********/
 @media (min-width: 868px){
   nav.navbar .navbar-brand {

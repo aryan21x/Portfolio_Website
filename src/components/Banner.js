@@ -47,7 +47,7 @@ const Banner = () => {
                 <Row className="align-items-center">
                     <Col xs={12} md={6} xl={7}>
                         <span className="tagline"> Welcome to my Portfolio</span>
-                        <h1>{`Hi I'm Aryan Raval `}<span className="wrap">{text}</span></h1>
+                        <h1>{`Hi I'm a `}<span className="wrap">{text}</span></h1>
                         <p> Computer Science major at South Dakota School of Mines</p>
                         <p> Always ready to learn.</p>
                         <button onClick={()=> console.log('connect')}> Let's connect <ArrowRightCircle size={25} /></button>

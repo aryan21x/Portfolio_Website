@@ -8,6 +8,7 @@ import ASP from "../assets/img/c-sharp.png";
 import Web from "../assets/img/js.png";
 import Django from "../assets/img/Django.png";
 import colorSharp from "../assets/img/color-sharp.png"
+import { Container, Row, Col} from 'react-bootstrap';
 
 const Skills = () => {
     const responsive = {
@@ -31,9 +32,9 @@ const Skills = () => {
 
     return (
         <section className="skill" id="skills">
-        <div className="container">
-            <div className="row">
-                <div className="col-12">
+        <Container>
+            <Row>
+                <Col>
                     <div className="skill-bx wow zoomIn">
                         <h2>Skills</h2>
                         <p>I can do both frontend and backend website Development.<br></br> Here are the skills and languages I'm proficient in.</p>
@@ -68,9 +69,9 @@ const Skills = () => {
                             </div>
                         </Carousel>
                     </div>
-                </div>
-            </div>
-        </div>
+                </Col>
+            </Row>
+        </Container>
         <img className="background-image-left" src={colorSharp} alt="Image" />
     </section>
     );
