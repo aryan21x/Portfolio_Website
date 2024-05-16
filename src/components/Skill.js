@@ -40,31 +40,31 @@ const Skills = () => {
                         <p>Here are the skills and languages I'm proficient in.</p>
                         <Carousel responsive={responsive} infinite={true} className="owl-carousel owl-theme skill-slider">
                             <div className="item">
-                                <img src={Web} alt="Image" />
+                                <img src={Web} alt="Web" />
                                 <h5>Web Development</h5>
                             </div>
                             <div className="item">
-                                <img src={React} alt="Image" />
+                                <img src={React} alt="React" />
                                 <h5>React.js</h5>
                             </div>
                             <div className="item">
-                                <img src={Django} alt="Image" />
+                                <img src={Django} alt="Django" />
                                 <h5>Django</h5>
                             </div>
                             <div className="item">
-                                <img src={ASP} alt="Image" />
+                                <img src={ASP} alt="ASP.net" />
                                 <h5>ASP.net</h5>
                             </div>
                             <div className="item">
-                                <img src={C} alt="Image" />
+                                <img src={C} alt="C++" />
                                 <h5>C++/C</h5>
                             </div>
                             <div className="item">
-                                <img src={Python} alt="Image" />
+                                <img src={Python} alt="Python" />
                                 <h5>Python</h5>
                             </div>
                             <div className="item recolor">
-                                <img src={SQL} alt="Image" />
+                                <img src={SQL} alt="SQL" />
                                 <h5>SQL</h5>
                             </div>
                         </Carousel>
@@ -72,7 +72,7 @@ const Skills = () => {
                 </Col>
             </Row>
         </Container>
-        <img className="background-image-left" src={colorSharp} alt="Image" />
+        <img className="background-image-left" src={colorSharp} alt="Skills-Bg" />
     </section>
     );
 }

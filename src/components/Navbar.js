@@ -7,6 +7,10 @@ import { faInstagram, faGithub, faLinkedin } from '@fortawesome/free-brands-svg-
 const CustomNavbar = () => {
   const [activeLink, setActiveLink] = useState('home');
   const [scrolled, seScrolled] = useState(false);
+  const [scrolledHome, seScrolledHome] = useState(true);
+  const [scrolledAbout,seScrolledAbout] = useState(false);
+  const [scrolledSkills,seScrolledSkills] = useState(false);
+  const [scrolledProjects,seScrolledProjects] = useState(false);
   
 
   useEffect( () => {
@@ -22,6 +26,63 @@ const CustomNavbar = () => {
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, [])
+
+
+  useEffect( () => {
+    const onScroll2 = () => {
+      if(window.innerWidth > 768){
+        if (window.scrollY < 500) {
+          seScrolledHome(true);
+          seScrolledAbout(false);
+          seScrolledSkills(false);
+          seScrolledProjects(false);
+        }
+        else if (window.scrollY > 500 && window.scrollY < 1000)
+        {
+          seScrolledHome(false);
+          seScrolledAbout(true);
+          seScrolledSkills(false);
+        }
+        else if (window.scrollY > 1000 && window.scrollY < 1500)
+        {
+          seScrolledAbout(false);
+          seScrolledSkills(true);
+          seScrolledProjects(false);
+        }
+        else if(window.scrollY > 1500) {
+          seScrolledSkills(false);
+          seScrolledProjects(true);
+        }
+      }
+      else{
+        if (window.scrollY < 500) {
+          seScrolledHome(true);
+          seScrolledAbout(false);
+          seScrolledSkills(false);
+          seScrolledProjects(false);
+        }
+        else if (window.scrollY > 500 && window.scrollY < 1000)
+        {
+          seScrolledHome(false);
+          seScrolledAbout(true);
+          seScrolledSkills(false);
+        }
+        else if (window.scrollY > 1000 && window.scrollY < 1500)
+        {
+          seScrolledAbout(false);
+          seScrolledSkills(true);
+          seScrolledProjects(false);
+        }
+        else if(window.scrollY > 1500) {
+          seScrolledSkills(false);
+          seScrolledProjects(true);
+        }
+      }
+    }
+    window.addEventListener("scroll", onScroll2);
+    return () => window.removeEventListener("scroll", onScroll2);
+  }, [])
+
 
 
   const onUpdateActive = (value) => {
@@ -54,10 +115,10 @@ const CustomNavbar = () => {
           </Navbar.Toggle>
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="ms-auto">
-              <Nav.Link href="#home" className={activeLink === 'home' ? 'act2 navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('home')} >Home</Nav.Link>
-              <Nav.Link href="#about" className={activeLink === 'about' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('about')} >About</Nav.Link>
-              <Nav.Link href="#skills" className={activeLink === 'skills' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('skills')} >Skills</Nav.Link>
-              <Nav.Link href="#projects"  className={activeLink === 'projects' ? 'act navbar-link' : 'navbar-link'} onClick={ () => onUpdateActive('projects')} >Projects</Nav.Link>
+              <Nav.Link href="#home" className={('navbar-link') + (scrolledHome ? " hoveredH" : "")} onClick={ () => onUpdateActive('home')} >Home</Nav.Link>
+              <Nav.Link href="#about" className={('navbar-link') + (scrolledAbout ? " hovered" : "")} onClick={ () => onUpdateActive('about')} >About</Nav.Link>
+              <Nav.Link href="#skills" className={('navbar-link') + (scrolledSkills ? " hovered" : "")} onClick={ () => onUpdateActive('skills')} >Skills</Nav.Link>
+              <Nav.Link href="#projects"  className={('navbar-link') + (scrolledProjects ? " hovered" : "")} onClick={ () => onUpdateActive('projects')} >Projects</Nav.Link>
             </Nav>
           <span className="navbar-text">
               <div className="social-icon">
