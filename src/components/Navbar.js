@@ -50,12 +50,12 @@ const CustomNavbar = () => {
           seScrolledSkills(true);
           seScrolledProjects(false);
         }
-        else if(window.scrollY > 1500 && window.scrollY < 2100) {
+        else if(window.scrollY > 1500 && window.scrollY < 2000) {
           seScrolledSkills(false);
           seScrolledProjects(true);
           seScrolledConnect(false);
         }
-        else if(window.scrollY > 2100){
+        else if(window.scrollY > 2000){
           seScrolledProjects(false);
           seScrolledConnect(true);
         }

@@ -578,8 +578,6 @@ nav.navbar .hoveredH{
 
 .footer .text-center{
   margin-top: 10px;
-  position: absolute;
-  right: 10px;
 }
 
 /******** Only Destop Screens ********/
@@ -639,17 +637,11 @@ nav.navbar .hoveredH{
     top: 15px;
     right: 15px;
   }
-    nav.navbar  .nav-link.navbar-link:hover,
-    nav.navbar .nav-link.act.navbar-link {
-    opacity: 1;
-    color:  #b400ff !important;
-    }
 
     nav.navbar .hoveredH{
       color: #b400ff !important;
     }
     
-
   .navbar .navbar-brand:hover img {
     filter: invert(14%) sepia(87%) saturate(5300%) hue-rotate(280deg) brightness(98%) contrast(125%);
     transition: filter 0.3s;
