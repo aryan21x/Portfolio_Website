@@ -479,7 +479,7 @@ nav.navbar .hoveredH{
   position: relative;
   border-radius: 20px;
   overflow: hidden;
-  height: 100%;
+  height: 300px;
   margin-bottom: 24px;
 }
 .proj-imgbx::before {
@@ -532,6 +532,19 @@ nav.navbar .hoveredH{
 .proj-imgbx img{
   max-width: 100%;
   height: 100%;
+}
+
+.proj-imgbx .colorChange{
+  color: #360145;
+  font-size: 30px;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+
+.proj-imgbx .colorChange:hover{
+  color: #fff;
+  font-size: 30px;
 }
 
 
@@ -656,18 +669,4 @@ nav.navbar .hoveredH{
   /* .about .resume-link {
     
   } */
-
-  .proj-imgbx {
-    position: relative;
-    overflow: hidden;
-    height: 100%;
-    margin-bottom: 24px;
-    border-radius: 0px;
-    padding-bottom: 2em;
-  }
-
-  .proj-imgbx img{
-    max-width: 100%;
-    height: 100%;
-  }
 }

@@ -2,7 +2,7 @@ import { Container, Row, Col, Tab, Nav } from "react-bootstrap";
 import { ProjectCard } from "./ProjectCard";
 import EliteRecruit from "../assets/img/EliteRecruit.png";
 import PetAdoption from "../assets/img/PetAdoption.png";
-import projImg3 from "../assets/img/PetAdoption.png";
+import Learning from "../assets/img/LearningLog.png";
 import colorSharp2 from "../assets/img/color-sharp2.png";
 
 const Project = () => {
@@ -21,7 +21,7 @@ const Project = () => {
         {
           title: "Learning Log(Django)",
           description: "This web application provides users with the ability to maintain a journal of things they are actively learning. Users can easily set up an account by choosing a username and password. Once logged in, they can effortlessly create new topics and journal entries to document their learning experiences. This project is developed using the Django package of Python.",
-          imgUrl: projImg3,
+          imgUrl: Learning,
         },
       ];
 
