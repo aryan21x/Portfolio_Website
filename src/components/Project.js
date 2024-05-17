@@ -3,7 +3,13 @@ import { ProjectCard } from "./ProjectCard";
 import EliteRecruit from "../assets/img/EliteRecruit.png";
 import PetAdoption from "../assets/img/PetAdoption.png";
 import Learning from "../assets/img/LearningLog.png";
+
+import Editor from "../assets/img/editor.jpg"
+import Knight from "../assets/img/knight.jpg"
+import Cards from "../assets/img/cards.jpg"
 import colorSharp2 from "../assets/img/color-sharp2.png";
+
+
 
 const Project = () => {
 
@@ -25,6 +31,27 @@ const Project = () => {
           description: "This web application provides users with the ability to maintain a journal of things they are actively learning. Users can easily set up an account by choosing a username and password. Once logged in, they can effortlessly create new topics and journal entries to document their learning experiences. This project is developed using the Django package of Python.",
           imgUrl: Learning,
           Github: "https://github.com/aryan21x/Learning_log",
+        },
+      ];
+
+      const projects2 = [
+        {
+          title: "Image Manipulation",
+          description: "Developed image manipulation program in C++ for processing PPM images with dynamic memory allocation, offering user-friendly options including X-axis and Y-axis flips, clockwise and counter-clockwise rotations, and sepia and grayscale conversions. Provided user flexibility to choose between binary and ASCII output formats for manipulated images.",
+          imgUrl: Editor,
+          Github: "https://github.com/aryan21x/Image-Manipulation",
+        },
+        {
+          title: "The Knight's Tour",
+          description: "Designed and implemented a recursive brute-force algorithm in C++ to solve the Knight's Tour problem on an n x n chessboard, with 'n' provided by user input. Developed a program that guides a knight to visit every square on the chessboard exactly once, and outputs a complete solution on the screen.",
+          imgUrl: Knight,
+          Github: "https://github.com/aryan21x/The-Knights-Tour",
+        },
+        {
+          title: "Game of War",
+          description: "The program imitates the classic card game 'War' and leverages the STL stack and queue templates to facilitate its execution. It offers two distinct launch options, each providing a unique gameplay experience. In one mode, the program generates a deck of 52 cards for each player using a random card generator, while in the other mode, it uses external files as input sources to populate each player's card queue.",
+          imgUrl: Cards,
+          Github: "https://github.com/aryan21x/Game-of-War",
         },
       ];
 
@@ -63,6 +90,18 @@ const Project = () => {
                       </Row>
                     </Tab.Pane>
                     <Tab.Pane eventKey="second">
+                    <Row>
+                        {
+                          projects2.map((project, index) => {
+                            return (
+                              <ProjectCard
+                                key={index}
+                                {...project}
+                                />
+                            )
+                          })
+                        }
+                      </Row>
                     </Tab.Pane>
                     <Tab.Pane eventKey="third">
                     </Tab.Pane>
