@@ -92,7 +92,6 @@ span.navbar-text {
 }
 .social-icon {
     display: inline-block;
-    margin-left: 14px;
 }
 .social-icon a {
     width: 42px;
@@ -580,6 +579,7 @@ nav.navbar .hoveredH{
   margin-top: 10px;
 }
 
+
 /******** Only Destop Screens ********/
 @media (min-width: 868px){
   nav.navbar .navbar-brand {
@@ -625,6 +625,9 @@ nav.navbar .hoveredH{
 
 /******** Only Mobile Screens *********/
 @media (max-width: 868px) {
+  body {
+    overflow-x: hidden !important; 
+  }
 
   nav.navbar .navbar-brand {
       width: 30%;
@@ -634,9 +637,9 @@ nav.navbar .hoveredH{
   }
 
   nav.navbar .navbar-toggler-icon {
-    position: fixed;
-    top: 15px;
-    right: 15px;
+    position: absolute;
+    top: 25px;
+    right: 25px;
   }
 
     nav.navbar .hoveredH{
@@ -661,7 +664,7 @@ nav.navbar .hoveredH{
     height: auto;
     max-height: 200px;
     position: absolute;
-    top: 20px;
+    top: 0px;
     right: 10%;
   }
 
@@ -696,7 +699,7 @@ nav.navbar .hoveredH{
 
   .footer .text-center{
     margin-top: 0px;
+    padding: 1em 0;
   }
-  
 
 }
