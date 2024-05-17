@@ -7,6 +7,9 @@ import Learning from "../assets/img/LearningLog.png";
 import Editor from "../assets/img/editor.jpg"
 import Knight from "../assets/img/knight.jpg"
 import Cards from "../assets/img/cards.jpg"
+
+import Pixel from "../assets/img/pixels.jpg"
+
 import colorSharp2 from "../assets/img/color-sharp2.png";
 
 
@@ -52,6 +55,15 @@ const Project = () => {
           description: "The program imitates the classic card game 'War' and leverages the STL stack and queue templates to facilitate its execution. It offers two distinct launch options, each providing a unique gameplay experience. In one mode, the program generates a deck of 52 cards for each player using a random card generator, while in the other mode, it uses external files as input sources to populate each player's card queue.",
           imgUrl: Cards,
           Github: "https://github.com/aryan21x/Game-of-War",
+        },
+      ];
+
+      const projects3 = [
+        {
+          title: "Printing PPM Images to Terminal(ARM Assembly)",
+          description: "The following project prints PPM images on the terminal. The project is built using Assembly and C. The input is an image in PPM form and the output is a black and white Image on the terminal which is displayed using ASCII characters.",
+          imgUrl: Pixel,
+          Github: "https://github.com/aryan21x/Printing-PPM-Image-on-Terminal",
         },
       ];
 
@@ -104,6 +116,18 @@ const Project = () => {
                       </Row>
                     </Tab.Pane>
                     <Tab.Pane eventKey="third">
+                    <Row>
+                        {
+                          projects3.map((project, index) => {
+                            return (
+                              <ProjectCard
+                                key={index}
+                                {...project}
+                                />
+                            )
+                          })
+                        }
+                      </Row>
                     </Tab.Pane>
                   </Tab.Content>
                 </Tab.Container>
