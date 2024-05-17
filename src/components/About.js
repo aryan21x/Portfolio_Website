@@ -7,21 +7,21 @@ const About = () => {
   return (
     <section className="about" id="about">
       <Container>
-        <Row>
-          <Col>
-            <img src={Profile} alt="profileImage" className="aboutBox" />
-          </Col>
-          <Col className="align-items-center">
-            <h1>Aryan Raval</h1>
-            <p>A bit About me</p>
-            <p className="SecondPara">
+      <Row className="align-items-center">
+        <Col md={4} className="text-md-center">
+          <img src={Profile} alt="profileImage" className="aboutBox" />
+        </Col>
+        <Col md={8}>
+          <h1>Aryan Raval</h1>
+          <p>A bit About me</p>
+          <p className="SecondPara">
             I am a Computer Science major at South Dakota School of Mines. I am a junior, expected to graduate in 2026. 
             I can do both frontend and backend web development. I specialize in Artificial Intelligence and Machine Learning. Feel free to contact me.
-            </p>
-            <a href={Resume} target="_blank" rel="noopener noreferrer" className="resume-link"> Resume </a>
-          </Col>
-        </Row>
-      </Container>
+          </p>
+          <a href={Resume} target="_blank" rel="noopener noreferrer" className="resume-link"> Resume </a>
+        </Col>
+      </Row>
+    </Container>
     </section>
   );
 };

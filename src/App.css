@@ -367,8 +367,8 @@ nav.navbar .hoveredH{
 
 .about  img {
   border-radius: 50%;
-  width: 400px; 
-  height: 400px; 
+  width: 300px; 
+  height: 300px; 
   object-fit: cover;
 }
 
@@ -442,14 +442,6 @@ nav.navbar .hoveredH{
       opacity: 1;
     }
 
-    .about  img {
-      border-radius: 50%;
-      width: 400px; 
-      height: 400px; 
-      object-fit: cover;
-      left: 300px;
-      position: absolute;
-    }
     
 }
 
@@ -528,9 +520,7 @@ nav.navbar .hoveredH{
     font-weight: 400;
   }
 
-  .about .resume-link {
-    position: absolute;
-    left: 10%;
-    top: 40%;
-  }
+  /* .about .resume-link {
+    
+  } */
 }
