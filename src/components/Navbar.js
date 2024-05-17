@@ -137,7 +137,7 @@ const CustomNavbar = () => {
                 <a href="https://www.linkedin.com/in/aryanraval/" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faLinkedin} className="colorChange"/></a>
                 <a href="https://www.instagram.com/aryan.21x_" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faInstagram} className="colorChange"/></a>
               </div>
-              <a href="#footer" className={scrolledConnect ? "connectHovered" : ""} > <span>Let's Connect</span></a>
+              <a href="#footer" className={('ConnectB') + (scrolledConnect ? " connectHovered" : "")} > <span>Let's Connect</span></a>
           </span>
           </Navbar.Collapse>
         </Container>
