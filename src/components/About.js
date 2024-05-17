@@ -1,4 +1,3 @@
-
 import { Container, Row, Col} from "react-bootstrap";
 import Profile from "../assets/img/ProfilePurple.jpg"
 import Resume from "../assets/resume/ResumeTemp.pdf";
