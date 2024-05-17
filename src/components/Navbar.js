@@ -11,6 +11,7 @@ const CustomNavbar = () => {
   const [scrolledAbout,seScrolledAbout] = useState(false);
   const [scrolledSkills,seScrolledSkills] = useState(false);
   const [scrolledProjects,seScrolledProjects] = useState(false);
+  const [scrolledConnect, seScrolledConnect] = useState(false);
   
 
   useEffect( () => {
@@ -49,9 +50,14 @@ const CustomNavbar = () => {
           seScrolledSkills(true);
           seScrolledProjects(false);
         }
-        else if(window.scrollY > 1500) {
+        else if(window.scrollY > 1500 && window.scrollY < 2100) {
           seScrolledSkills(false);
           seScrolledProjects(true);
+          seScrolledConnect(false);
+        }
+        else if(window.scrollY > 2100){
+          seScrolledProjects(false);
+          seScrolledConnect(true);
         }
       }
       else{
@@ -73,9 +79,14 @@ const CustomNavbar = () => {
           seScrolledSkills(true);
           seScrolledProjects(false);
         }
-        else if(window.scrollY > 1500) {
+        else if(window.scrollY > 1500 && window.scrollY < 2500) {
           seScrolledSkills(false);
           seScrolledProjects(true);
+          seScrolledConnect(false);
+        }
+        else if(window.scrollY > 2500){
+          seScrolledProjects(false);
+          seScrolledConnect(true);
         }
       }
     }
@@ -126,7 +137,7 @@ const CustomNavbar = () => {
                 <a href="https://www.linkedin.com/in/aryanraval/" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faLinkedin} className="colorChange"/></a>
                 <a href="https://www.instagram.com/aryan.21x_" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faInstagram} className="colorChange"/></a>
               </div>
-              <button className="vvd" onClick={() => console.log('connect')}> <span>Let's Connect</span></button>
+              <a href="#footer" className={scrolledConnect ? "connectHovered" : ""} > <span>Let's Connect</span></a>
           </span>
           </Navbar.Collapse>
         </Container>
