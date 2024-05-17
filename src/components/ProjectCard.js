@@ -2,7 +2,7 @@ import { Col } from "react-bootstrap";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGithub} from '@fortawesome/free-brands-svg-icons';
 
-export const ProjectCard = ({ title, description, imgUrl }) => {
+export const ProjectCard = ({ title, description, imgUrl, Github }) => {
   return (
     <Col size={12} sm={6} md={4}>
       <div className="proj-imgbx">
@@ -12,7 +12,7 @@ export const ProjectCard = ({ title, description, imgUrl }) => {
           <span>{description}</span>
         </div>
         <div>
-            <a href="https://github.com/aryan21x" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faGithub} className="colorChange"/></a>
+            <a href={Github} target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faGithub} className="colorChange"/></a>
         </div>
       </div>
     </Col>
