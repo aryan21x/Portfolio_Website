@@ -1,11 +1,25 @@
-import React from "react";
+
 import { Container, Row, Col} from "react-bootstrap";
 import Profile from "../assets/img/ProfilePurple.jpg"
 import Resume from "../assets/resume/ResumeTemp.pdf";
 import 'animate.css'
 import TrackVisibility from "react-on-screen";
+import React, { useState, useEffect } from 'react';
 
 const About = () => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+  
   return (
     <section className="about" id="about">
       <Container>
@@ -15,7 +29,7 @@ const About = () => {
         <Col md={4} className={("text-md-center") + (isVisible? " animate__animated animate__fadeInLeft": "")}>
           <img src={Profile} alt="profileImage" className="aboutBox" />
         </Col>
-        <Col md={8} className={(isVisible? "animate__animated animate__fadeInRight": "")}>
+        <Col md={8}  className={`text-md-center ${isMobile && isVisible? " animate__animated animate__fadeInUp" : ""} ${isVisible? " animate__animated animate__fadeInRight" : ""}`}>
           <h1>Aryan Raval</h1>
           <p>A bit About me</p>
           <p className="SecondPara">

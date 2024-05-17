@@ -640,6 +640,7 @@ nav.navbar .hoveredH{
     position: absolute;
     top: 25px;
     right: 25px;
+    z-index: 999;
   }
 
     nav.navbar .hoveredH{
@@ -651,9 +652,6 @@ nav.navbar .hoveredH{
     transition: filter 0.3s;
   }
 
-  nav.navbar .toggle{
-      z-index: -1;
-  }
   .banner .tagline{
     margin-top: 160px;
   }
