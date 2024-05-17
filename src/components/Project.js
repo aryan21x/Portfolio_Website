@@ -74,13 +74,8 @@ const Project = () => {
       <Container>
         <Row>
           <Col size={12}>
-          <TrackVisibility>
-                { ({isVisible}) =>
-              <div className={isVisible? "animate__animated animate__fadeInDown": ""}>
                 <h2>Projects</h2>
                 <p>I have classified my projects into three types: Websites, C++ Applications, and Other.</p>
-              </div>}
-          </TrackVisibility>
                 <Tab.Container id="projects-tabs" defaultActiveKey="first">
                   <Nav variant="pills" className="nav-pills mb-5 justify-content-center align-items-center" id="pills-tab">
                     <Nav.Item>
