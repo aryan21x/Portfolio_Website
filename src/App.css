@@ -625,6 +625,7 @@ nav.navbar .hoveredH{
 
 /******** Only Mobile Screens *********/
 @media (max-width: 868px) {
+
   nav.navbar .navbar-brand {
       width: 30%;
       height: auto;
@@ -693,7 +694,9 @@ nav.navbar .hoveredH{
     font-weight: 400;
   }
 
-  /* .about .resume-link {
-    
-  } */
+  .footer .text-center{
+    margin-top: 0px;
+  }
+  
+
 }

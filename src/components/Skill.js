@@ -10,6 +10,9 @@ import Django from "../assets/img/Django.png";
 import colorSharp from "../assets/img/color-sharp.png"
 import { Container, Row, Col} from 'react-bootstrap';
 
+import 'animate.css'
+import TrackVisibility from "react-on-screen";
+
 const Skills = () => {
     const responsive = {
         superLargeDesktop: {
@@ -36,8 +39,16 @@ const Skills = () => {
             <Row>
                 <Col>
                     <div className="skill-bx wow zoomIn">
+                <TrackVisibility>
+                    { ({isVisible}) =>
+                    <div className={isVisible? "animate__animated animate__fadeInDown": ""}>
                         <h2>Skills</h2>
                         <p>Here are the skills and languages I'm proficient in.</p>
+                    </div>}
+                </TrackVisibility>
+                <TrackVisibility partialVisibility>
+                    { ({isVisible}) =>
+                    <div className={isVisible? "animate__animated animate__slideInLeft": ""}>
                         <Carousel responsive={responsive} infinite={true} className="owl-carousel owl-theme skill-slider">
                             <div className="item">
                                 <img src={Web} alt="Web" />
@@ -68,6 +79,8 @@ const Skills = () => {
                                 <h5>SQL</h5>
                             </div>
                         </Carousel>
+                        </div>}
+                </TrackVisibility>
                     </div>
                 </Col>
             </Row>

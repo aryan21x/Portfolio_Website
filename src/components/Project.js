@@ -11,6 +11,8 @@ import Cards from "../assets/img/cards.jpg"
 import Pixel from "../assets/img/pixels.jpg"
 
 import colorSharp2 from "../assets/img/color-sharp2.png";
+import 'animate.css'
+import TrackVisibility from "react-on-screen";
 
 
 
@@ -72,8 +74,13 @@ const Project = () => {
       <Container>
         <Row>
           <Col size={12}>
+          <TrackVisibility>
+                { ({isVisible}) =>
+              <div className={isVisible? "animate__animated animate__fadeInDown": ""}>
                 <h2>Projects</h2>
                 <p>I have classified my projects into three types: Websites, C++ Applications, and Other.</p>
+              </div>}
+          </TrackVisibility>
                 <Tab.Container id="projects-tabs" defaultActiveKey="first">
                   <Nav variant="pills" className="nav-pills mb-5 justify-content-center align-items-center" id="pills-tab">
                     <Nav.Item>
@@ -86,8 +93,10 @@ const Project = () => {
                       <Nav.Link eventKey="third">Other</Nav.Link>
                     </Nav.Item>
                   </Nav>
+                  <TrackVisibility partialVisibility>
+                { ({isVisible}) =>
                   <Tab.Content>
-                    <Tab.Pane eventKey="first">
+                    <Tab.Pane eventKey="first" className={isVisible? "animate__animated animate__fadeInUp": ""}>
                       <Row>
                         {
                           projects.map((project, index) => {
@@ -101,7 +110,7 @@ const Project = () => {
                         }
                       </Row>
                     </Tab.Pane>
-                    <Tab.Pane eventKey="second">
+                    <Tab.Pane eventKey="second" className={isVisible? "animate__animated animate__fadeInUp": ""}>
                     <Row>
                         {
                           projects2.map((project, index) => {
@@ -115,7 +124,7 @@ const Project = () => {
                         }
                       </Row>
                     </Tab.Pane>
-                    <Tab.Pane eventKey="third">
+                    <Tab.Pane eventKey="third" className={isVisible? "animate__animated animate__fadeInUp": ""}>
                     <Row>
                         {
                           projects3.map((project, index) => {
@@ -130,6 +139,8 @@ const Project = () => {
                       </Row>
                     </Tab.Pane>
                   </Tab.Content>
+                  }
+                  </TrackVisibility>
                 </Tab.Container>
           </Col>
         </Row>
