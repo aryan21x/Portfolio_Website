@@ -11,8 +11,6 @@ import Cards from "../assets/img/cards.jpg"
 import Pixel from "../assets/img/pixels.jpg"
 
 import colorSharp2 from "../assets/img/color-sharp2.png";
-import 'animate.css'
-import TrackVisibility from "react-on-screen";
 
 
 
@@ -73,9 +71,9 @@ const Project = () => {
         <section className="project" id="projects">
       <Container>
         <Row>
-          <Col size={12}>
+          <Col xs={12}>
                 <h2>Projects</h2>
-                <p>I have classified my projects into three types: Websites, C++ Applications, and Other.</p>
+                <p className="section-intro">I have classified my projects into three types: Websites, C++ Applications, and Other.</p>
                 <Tab.Container id="projects-tabs" defaultActiveKey="first">
                   <Nav variant="pills" className="nav-pills mb-5 justify-content-center align-items-center" id="pills-tab">
                     <Nav.Item>
@@ -88,11 +86,9 @@ const Project = () => {
                       <Nav.Link eventKey="third">Other</Nav.Link>
                     </Nav.Item>
                   </Nav>
-                  <TrackVisibility partialVisibility>
-                { ({isVisible}) =>
                   <Tab.Content>
-                    <Tab.Pane eventKey="first" className={isVisible? "animate__animated animate__fadeInUp": ""}>
-                      <Row>
+                    <Tab.Pane eventKey="first">
+                      <Row className="g-4 justify-content-center">
                         {
                           projects.map((project, index) => {
                             return (
@@ -105,8 +101,8 @@ const Project = () => {
                         }
                       </Row>
                     </Tab.Pane>
-                    <Tab.Pane eventKey="second" className={isVisible? "animate__animated animate__fadeInUp": ""}>
-                    <Row>
+                    <Tab.Pane eventKey="second">
+                    <Row className="g-4 justify-content-center">
                         {
                           projects2.map((project, index) => {
                             return (
@@ -119,8 +115,8 @@ const Project = () => {
                         }
                       </Row>
                     </Tab.Pane>
-                    <Tab.Pane eventKey="third" className={isVisible? "animate__animated animate__fadeInUp": ""}>
-                    <Row>
+                    <Tab.Pane eventKey="third">
+                    <Row className="g-4 justify-content-center">
                         {
                           projects3.map((project, index) => {
                             return (
@@ -134,13 +130,11 @@ const Project = () => {
                       </Row>
                     </Tab.Pane>
                   </Tab.Content>
-                  }
-                  </TrackVisibility>
                 </Tab.Container>
           </Col>
         </Row>
       </Container>
-      <img className="background-image-right" src={colorSharp2} alt="projectBg"></img>
+      <img className="background-image-right" src={colorSharp2} alt="" aria-hidden="true" />
     </section>
     );
 }

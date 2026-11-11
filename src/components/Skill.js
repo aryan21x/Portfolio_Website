@@ -10,21 +10,18 @@ import Django from "../assets/img/Django.png";
 import colorSharp from "../assets/img/color-sharp.png"
 import { Container, Row, Col} from 'react-bootstrap';
 
-import 'animate.css'
-import TrackVisibility from "react-on-screen";
-
 const Skills = () => {
     const responsive = {
-        superLargeDesktop: {
-          breakpoint: { max: 4000, min: 3000 },
-          items: 5
-        },
         desktop: {
-          breakpoint: { max: 3000, min: 1024 },
+          breakpoint: { max: Number.MAX_SAFE_INTEGER, min: 1280 },
+          items: 4
+        },
+        laptop: {
+          breakpoint: { max: 1280, min: 768 },
           items: 3
         },
         tablet: {
-          breakpoint: { max: 1024, min: 464 },
+          breakpoint: { max: 768, min: 464 },
           items: 2
         },
         mobile: {
@@ -38,12 +35,9 @@ const Skills = () => {
         <Container>
             <Row>
                 <Col>
-                    <div className="skill-bx wow zoomIn">
+                    <div className="skill-bx">
                         <h2>Skills</h2>
                         <p>Here are the skills and languages I'm proficient in.</p>
-                <TrackVisibility partialVisibility>
-                    { ({isVisible}) =>
-                    <div className={isVisible? "animate__animated animate__slideInLeft": ""}>
                         <Carousel responsive={responsive} infinite={true} className="owl-carousel owl-theme skill-slider">
                             <div className="item">
                                 <img src={Web} alt="Web" />
@@ -74,13 +68,11 @@ const Skills = () => {
                                 <h5>SQL</h5>
                             </div>
                         </Carousel>
-                        </div>}
-                </TrackVisibility>
                     </div>
                 </Col>
             </Row>
         </Container>
-        <img className="background-image-left" src={colorSharp} alt="Skills-Bg" />
+        <img className="background-image-left" src={colorSharp} alt="" aria-hidden="true" />
     </section>
     );
 }

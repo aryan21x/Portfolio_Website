@@ -1,149 +1,93 @@
-import {useState, useEffect} from "react";
-import {Navbar,Nav,Container} from 'react-bootstrap';
-import logo from "../assets/img/AnR2.svg";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faInstagram, faGithub, faLinkedin } from '@fortawesome/free-brands-svg-icons';
+import { useEffect, useState } from 'react';
+import { Navbar, Nav, Container } from 'react-bootstrap';
+import logo from '../assets/img/AnR2.svg';
+import SocialLinks from './SocialLinks';
+
+const sections = ['home', 'about', 'skills', 'projects', 'footer'];
 
 const CustomNavbar = () => {
-  // const [activeLink, setActiveLink] = useState('home');
-  const [scrolled, seScrolled] = useState(false);
-  const [scrolledHome, seScrolledHome] = useState(true);
-  const [scrolledAbout,seScrolledAbout] = useState(false);
-  const [scrolledSkills,seScrolledSkills] = useState(false);
-  const [scrolledProjects,seScrolledProjects] = useState(false);
-  const [scrolledConnect, seScrolledConnect] = useState(false);
-  
+  const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
+  const [expanded, setExpanded] = useState(false);
 
-  useEffect( () => {
-    const onScroll = () => {
-      if(window.innerWidth > 768) {
-          if (window.scrollY > 100) {
-            seScrolled(true);
-          } else{
-            seScrolled(false);
-          }
-        }
-    }
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [])
+  useEffect(() => {
+    const updateNavigation = () => {
+      setScrolled(window.scrollY > 24);
 
+      // Follow the rendered sections rather than laptop-specific scroll offsets.
+      const activationPoint = Math.min(window.innerHeight * 0.25, 200);
+      let currentSection = 'home';
 
-  useEffect( () => {
-    const onScroll2 = () => {
-      if(window.innerWidth > 768){
-        if (window.scrollY < 500) {
-          seScrolledHome(true);
-          seScrolledAbout(false);
-          seScrolledSkills(false);
-          seScrolledProjects(false);
+      sections.forEach((id) => {
+        const section = document.getElementById(id);
+        if (section && section.getBoundingClientRect().top <= activationPoint) {
+          currentSection = id;
         }
-        else if (window.scrollY > 500 && window.scrollY < 1000)
-        {
-          seScrolledHome(false);
-          seScrolledAbout(true);
-          seScrolledSkills(false);
-        }
-        else if (window.scrollY > 1000 && window.scrollY < 1500)
-        {
-          seScrolledAbout(false);
-          seScrolledSkills(true);
-          seScrolledProjects(false);
-        }
-        else if(window.scrollY > 1500 && window.scrollY < 2000) {
-          seScrolledSkills(false);
-          seScrolledProjects(true);
-          seScrolledConnect(false);
-        }
-        else if(window.scrollY > 2000){
-          seScrolledProjects(false);
-          seScrolledConnect(true);
-        }
+      });
+
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+        currentSection = 'footer';
       }
-      else{
-        if (window.scrollY < 500) {
-          seScrolledHome(true);
-          seScrolledAbout(false);
-          seScrolledSkills(false);
-          seScrolledProjects(false);
-        }
-        else if (window.scrollY > 500 && window.scrollY < 1000)
-        {
-          seScrolledHome(false);
-          seScrolledAbout(true);
-          seScrolledSkills(false);
-        }
-        else if (window.scrollY > 1000 && window.scrollY < 1500)
-        {
-          seScrolledAbout(false);
-          seScrolledSkills(true);
-          seScrolledProjects(false);
-        }
-        else if(window.scrollY > 1500 && window.scrollY < 2500) {
-          seScrolledSkills(false);
-          seScrolledProjects(true);
-          seScrolledConnect(false);
-        }
-        else if(window.scrollY > 2500){
-          seScrolledProjects(false);
-          seScrolledConnect(true);
-        }
-      }
-    }
-    window.addEventListener("scroll", onScroll2);
-    return () => window.removeEventListener("scroll", onScroll2);
-  }, [])
 
+      setActiveSection(currentSection);
+    };
 
+    updateNavigation();
+    window.addEventListener('scroll', updateNavigation, { passive: true });
+    window.addEventListener('resize', updateNavigation);
+    return () => {
+      window.removeEventListener('scroll', updateNavigation);
+      window.removeEventListener('resize', updateNavigation);
+    };
+  }, []);
 
-  // const onUpdateActive = (value) => {
-  //   setActiveLink(value);
-  // }
-
-  // const onLogoClick = () => {
-  //   setActiveLink('home');
-  // }
-
-  const Toggler = () => {
-    seScrolled(!scrolled);
-  }
+  const closeMenu = () => setExpanded(false);
 
   return (
-    <>
-      <head>
-        <title>Aryan Raval</title>
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-          integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
-      </head>
-      <Navbar expand="lg" className={scrolled ? "scrolled": ""}>  {/* change to lg */}
-        <Container fluid>
-          <Navbar.Brand href="#home">
-              <img src={logo} alt="logo" />
-          </Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" onClick={ () => Toggler()}>
-              <span className="navbar-toggler-icon"></span>
-          </Navbar.Toggle>
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto">
-              <Nav.Link href="#home" className={('navbar-link') + (scrolledHome ? " hoveredH" : "")}  >Home</Nav.Link>
-              <Nav.Link href="#about" className={('navbar-link') + (scrolledAbout ? " hovered" : "")}  >About</Nav.Link>
-              <Nav.Link href="#skills" className={('navbar-link') + (scrolledSkills ? " hovered" : "")} >Skills</Nav.Link>
-              <Nav.Link href="#projects"  className={('navbar-link') + (scrolledProjects ? " hovered" : "")} >Projects</Nav.Link>
-            </Nav>
-          <span className="navbar-text">
-              <div className="social-icon">
-                <a href="https://github.com/aryan21x" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faGithub} className="colorChange"/></a>
-                <a href="https://www.linkedin.com/in/aryanraval/" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faLinkedin} className="colorChange"/></a>
-                <a href="https://www.instagram.com/aryan.21x_" target="_blank" rel="noopener noreferrer"><FontAwesomeIcon icon={faInstagram} className="colorChange"/></a>
-              </div>
-              <a href="#footer" className={('ConnectB') + (scrolledConnect ? " connectHovered" : "")} > <span>Let's Connect</span></a>
-          </span>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-    </>
+    <Navbar
+      expand="lg"
+      expanded={expanded}
+      onToggle={setExpanded}
+      className={scrolled || expanded ? 'scrolled' : ''}
+      aria-label="Main navigation"
+    >
+      <Container>
+        <Navbar.Brand href="#home" onClick={closeMenu} aria-label="Aryan Raval home">
+          <img src={logo} alt="" />
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" aria-label="Toggle navigation" aria-expanded={expanded}>
+          <span className="navbar-toggler-icon" />
+        </Navbar.Toggle>
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ms-auto">
+            {sections.slice(0, -1).map((id) => (
+              <Nav.Link
+                key={id}
+                href={'#' + id}
+                className="navbar-link"
+                active={activeSection === id}
+                aria-current={activeSection === id ? 'location' : undefined}
+                onClick={closeMenu}
+              >
+                {id.charAt(0).toUpperCase() + id.slice(1)}
+              </Nav.Link>
+            ))}
+          </Nav>
+          <div className="navbar-text">
+            <SocialLinks />
+            <a
+              href="#footer"
+              className={'ConnectB' + (activeSection === 'footer' ? ' connectHovered' : '')}
+              aria-current={activeSection === 'footer' ? 'location' : undefined}
+              onClick={closeMenu}
+            >
+              Let's Connect
+            </a>
+          </div>
+        </Navbar.Collapse>
+      </Container>
+    </Navbar>
   );
-}
+};
 
 export default CustomNavbar;

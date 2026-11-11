@@ -1,72 +1,59 @@
-import { useState, useEffect} from "react";
-import {Container, Row, Col} from "react-bootstrap";
-import { ArrowRightCircle } from "react-bootstrap-icons";
-import headerImg from "../assets/img/Butterfly.png";
-import 'animate.css'
-import TrackVisibility from "react-on-screen";
+import { useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
+import { ArrowRightCircle } from 'react-bootstrap-icons';
+import headerImg from '../assets/img/Butterfly.png';
+
+const roles = ['Web Developer', 'Software Engineer', 'Programmer'];
 
 const Banner = () => {
-    const [loopNum, setLoopNum] = useState(0);
-    const [isDeleting, setIsDeleting] = useState(false);
-    const toRotate = ["Web Developer", "Software Engineer", "Programmer"];
-    const [text, setText] = useState('');
-    const [delta, setDelta] = useState(300 - Math.random() * 100);
-    const period = 2000;
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [text, setText] = useState('');
 
-    const tick = () => {
-        let i = loopNum % toRotate.length;
-        let fullText = toRotate[i];
-        let updatedText = isDeleting ? fullText.substring(0, text.length - 1) : fullText.substring(0, text.length + 1);
-        
-        setText(updatedText);
+  useEffect(() => {
+    const fullText = roles[roleIndex];
+    const completed = text === fullText;
+    const emptied = isDeleting && text === '';
+    const delay = !isDeleting && completed ? 2000 : emptied ? 500 : isDeleting ? 60 : 120;
+    const timer = setTimeout(() => {
+      if (!isDeleting && completed) {
+        setIsDeleting(true);
+      } else if (emptied) {
+        setIsDeleting(false);
+        setRoleIndex((index) => (index + 1) % roles.length);
+      } else {
+        setText(fullText.slice(0, text.length + (isDeleting ? -1 : 1)));
+      }
+    }, delay);
 
-        if (isDeleting) {
-            setDelta(prevDelta => prevDelta / 2)
-        }
+    return () => clearTimeout(timer);
+  }, [text, isDeleting, roleIndex]);
 
-        if ( !isDeleting && updatedText === fullText){
-            setIsDeleting(true);
-            setDelta(period);
-        }   else if (isDeleting && updatedText === '') {
-            setIsDeleting(false);
-            setLoopNum(loopNum + 1);
-            setDelta(500);
-        }
-    }
-
-    useEffect ( () =>{
-        let ticker = setInterval ( () => {
-            tick();
-        }, delta)
-
-        return () => { clearInterval(ticker)};
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    } , [text])
-
-
-    return (
-        <section className="banner" id="home">
-            <Container>
-                <TrackVisibility partialVisibility>
-                { ({isVisible}) =>
-                <div className={isVisible? "animate__animated animate__slideInUp": ""}>
-                    <Row className="align-items-center">
-                        <Col xs={12} md={6} xl={7}>
-                            <span className="tagline"> Welcome to my Portfolio</span>
-                            <h1>{`Hi I'm Aryan Raval a `}<span className="wrap">{text}</span></h1>
-                            <p> Always ready to learn.</p>
-                            <a href="#about" className="BannerBtn">Learn more about me <ArrowRightCircle size={25} /></a>
-                        </Col>
-                        <Col xs={12} md={6} xl={5}>
-                            <img src={headerImg} alt="Header Img" />
-                        </Col>
-                    </Row>
-                </div>}
-                </TrackVisibility>
-            </Container>
-        </section>
-    );
-}
-
+  return (
+    <section className="banner" id="home">
+      <Container>
+        <div className="banner-layout">
+          <div className="banner-copy">
+            <span className="tagline">Welcome to my Portfolio</span>
+            <h1>
+              Hi, I'm Aryan Raval
+              <span className="banner-role" aria-hidden="true">
+                <span>a <span className="wrap">{text}</span></span>
+              </span>
+              <span className="visually-hidden">, a web developer, software engineer, and programmer.</span>
+            </h1>
+            <p>Always ready to learn.</p>
+            <a href="#about" className="BannerBtn">
+              Learn more about me <ArrowRightCircle size={25} />
+            </a>
+          </div>
+          <div className="banner-art">
+            <img src={headerImg} alt="Purple butterfly illustration" />
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+};
 
 export default Banner;
