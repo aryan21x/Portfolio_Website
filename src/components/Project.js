@@ -1,142 +1,121 @@
-import { Container, Row, Col, Tab, Nav } from "react-bootstrap";
-import { ProjectCard } from "./ProjectCard";
-import EliteRecruit from "../assets/img/EliteRecruit.png";
-import PetAdoption from "../assets/img/PetAdoption.png";
-import Learning from "../assets/img/LearningLog.png";
-
-import Editor from "../assets/img/editor.jpg"
-import Knight from "../assets/img/knight.jpg"
-import Cards from "../assets/img/cards.jpg"
-
-import Pixel from "../assets/img/pixels.jpg"
-
-import colorSharp2 from "../assets/img/color-sharp2.png";
-
-
+import { useEffect, useRef, useState } from 'react';
+import { ArrowLeft, ArrowRight } from 'react-bootstrap-icons';
+import { projectCategories, projects } from '../data/portfolio';
+import { ProjectCard } from './ProjectCard';
+import { interfaceSounds } from '../utils/interfaceSounds';
 
 const Project = () => {
+  const [category, setCategory] = useState('all');
+  const [activeIndex, setActiveIndex] = useState(0);
+  const trackRef = useRef(null);
+  const activeRef = useRef(0);
+  const pendingIndex = useRef(null);
+  const scrollFrame = useRef(null);
+  const visible = projects.filter((project) => category === 'all' || project.category === category);
 
-    const projects = [
-        {
-          title: "EliteRecruit (ASP.net)",
-          description: "A team project that developed a website based on the MVC ASP.NET Core framework that facilitates recruiters in browsing a list of students for potential recruitment. The website allows recruiters to perform CRUD, sort, and filter operations on the students. The website uses the Bootstrap framework for its design.",
-          imgUrl: EliteRecruit,
-          Github: "https://github.com/aryan21x/Recruting-Website",
-        },
-        {
-          title: "Pet Adoption (Django,SQL)",
-          description: "Pet adoption website made by a team of two, powered by Django framework which is integrated with MySQL Workbench for handling the database operations. It has six interconnected tables for Pets, Shelters, Workers, Vets, Adopters, and Businesses. Admins can perform CRUD, sort, and filter operations on each of these tables.",
-          imgUrl: PetAdoption,
-          Github: "https://github.com/aryan21x/PetAdoption-website",
-        },
-        {
-          title: "Learning Log(Django)",
-          description: "This web application provides users with the ability to maintain a journal of things they are actively learning. Users can easily set up an account by choosing a username and password. Once logged in, they can effortlessly create new topics and journal entries to document their learning experiences. This project is developed using the Django package of Python.",
-          imgUrl: Learning,
-          Github: "https://github.com/aryan21x/Learning_log",
-        },
-      ];
+  useEffect(() => {
+    const track = trackRef.current;
+    const updateActive = () => {
+      scrollFrame.current = null;
+      const slides = Array.from(track.children);
+      const first = slides[0].offsetLeft;
+      if (pendingIndex.current !== null) {
+        const target = slides[pendingIndex.current];
+        if (target && Math.abs(target.offsetLeft - first - track.scrollLeft) > 2) return;
+        pendingIndex.current = null;
+      }
+      const closest = slides.reduce((nearest, slide, index) => (
+        Math.abs(slide.offsetLeft - first - track.scrollLeft) < Math.abs(slides[nearest].offsetLeft - first - track.scrollLeft) ? index : nearest
+      ), 0);
+      if (closest !== activeRef.current) {
+        activeRef.current = closest;
+        setActiveIndex(closest);
+        interfaceSounds.play('project');
+      }
+    };
+    const handleScroll = () => {
+      if (scrollFrame.current === null) scrollFrame.current = window.requestAnimationFrame(updateActive);
+    };
+    track.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      track.removeEventListener('scroll', handleScroll);
+      if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current);
+      scrollFrame.current = null;
+    };
+  }, [category]);
 
-      const projects2 = [
-        {
-          title: "Image Manipulation",
-          description: "Developed image manipulation program in C++ for processing PPM images with dynamic memory allocation, offering user-friendly options including X-axis and Y-axis flips, clockwise and counter-clockwise rotations, and sepia and grayscale conversions. Provided user flexibility to choose between binary and ASCII output formats for manipulated images.",
-          imgUrl: Editor,
-          Github: "https://github.com/aryan21x/Image-Manipulation",
-        },
-        {
-          title: "The Knight's Tour",
-          description: "Designed and implemented a recursive brute-force algorithm in C++ to solve the Knight's Tour problem on an n x n chessboard, with 'n' provided by user input. Developed a program that guides a knight to visit every square on the chessboard exactly once, and outputs a complete solution on the screen.",
-          imgUrl: Knight,
-          Github: "https://github.com/aryan21x/The-Knights-Tour",
-        },
-        {
-          title: "Game of War",
-          description: "The program imitates the classic card game 'War' and leverages the STL stack and queue templates to facilitate its execution. It offers two distinct launch options, each providing a unique gameplay experience. In one mode, the program generates a deck of 52 cards for each player using a random card generator, while in the other mode, it uses external files as input sources to populate each player's card queue.",
-          imgUrl: Cards,
-          Github: "https://github.com/aryan21x/Game-of-War",
-        },
-      ];
+  useEffect(() => {
+    const track = trackRef.current;
+    const resize = () => {
+      pendingIndex.current = null;
+      // Keep the selected project aligned when a phone rotates or the window resizes.
+      const slide = track.children[activeRef.current];
+      const left = slide.offsetLeft - track.children[0].offsetLeft;
+      if (Math.abs(track.scrollLeft - left) > 1) track.scrollLeft = left;
+    };
+    window.addEventListener('resize', resize);
+    return () => window.removeEventListener('resize', resize);
+  }, [category]);
 
-      const projects3 = [
-        {
-          title: "Printing PPM Images to Terminal(ARM Assembly)",
-          description: "The following project prints PPM images on the terminal. The project is built using Assembly and C. The input is an image in PPM form and the output is a black and white Image on the terminal which is displayed using ASCII characters.",
-          imgUrl: Pixel,
-          Github: "https://github.com/aryan21x/Printing-PPM-Image-on-Terminal",
-        },
-      ];
+  const goTo = (index) => {
+    const next = Math.max(0, Math.min(visible.length - 1, index));
+    if (next === activeRef.current) return;
+    const track = trackRef.current;
+    const left = track.children[next].offsetLeft - track.children[0].offsetLeft;
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    pendingIndex.current = next;
+    activeRef.current = next;
+    setActiveIndex(next);
+    interfaceSounds.play('project');
+    if (track.scrollTo) track.scrollTo({ left, behavior: reducedMotion ? 'instant' : 'smooth' });
+    else track.scrollLeft = left;
+  };
 
-    return (
-        <section className="project" id="projects">
-      <Container>
-        <Row>
-          <Col xs={12}>
-                <h2>Projects</h2>
-                <p className="section-intro">I have classified my projects into three types: Websites, C++ Applications, and Other.</p>
-                <Tab.Container id="projects-tabs" defaultActiveKey="first">
-                  <Nav variant="pills" className="nav-pills mb-5 justify-content-center align-items-center" id="pills-tab">
-                    <Nav.Item>
-                      <Nav.Link eventKey="first">Websites</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                      <Nav.Link eventKey="second">C++ Apps</Nav.Link>
-                    </Nav.Item>
-                    <Nav.Item>
-                      <Nav.Link eventKey="third">Other</Nav.Link>
-                    </Nav.Item>
-                  </Nav>
-                  <Tab.Content>
-                    <Tab.Pane eventKey="first">
-                      <Row className="g-4 justify-content-center">
-                        {
-                          projects.map((project, index) => {
-                            return (
-                              <ProjectCard
-                                key={index}
-                                {...project}
-                                />
-                            )
-                          })
-                        }
-                      </Row>
-                    </Tab.Pane>
-                    <Tab.Pane eventKey="second">
-                    <Row className="g-4 justify-content-center">
-                        {
-                          projects2.map((project, index) => {
-                            return (
-                              <ProjectCard
-                                key={index}
-                                {...project}
-                                />
-                            )
-                          })
-                        }
-                      </Row>
-                    </Tab.Pane>
-                    <Tab.Pane eventKey="third">
-                    <Row className="g-4 justify-content-center">
-                        {
-                          projects3.map((project, index) => {
-                            return (
-                              <ProjectCard
-                                key={index}
-                                {...project}
-                                />
-                            )
-                          })
-                        }
-                      </Row>
-                    </Tab.Pane>
-                  </Tab.Content>
-                </Tab.Container>
-          </Col>
-        </Row>
-      </Container>
-      <img className="background-image-right" src={colorSharp2} alt="" aria-hidden="true" />
+  const handleKeyDown = (event) => {
+    if (event.target !== event.currentTarget) return;
+    const destination = { ArrowLeft: activeIndex - 1, ArrowRight: activeIndex + 1, Home: 0, End: visible.length - 1 }[event.key];
+    if (destination !== undefined) {
+      event.preventDefault();
+      goTo(destination);
+    }
+  };
+
+  const filterProjects = (next) => {
+    if (next !== category) {
+      if (scrollFrame.current !== null) window.cancelAnimationFrame(scrollFrame.current);
+      scrollFrame.current = null;
+      pendingIndex.current = null;
+      activeRef.current = 0;
+      setActiveIndex(0);
+      setCategory(next);
+      interfaceSounds.play('project');
+    }
+  };
+
+  return (
+    <section className="projects section" id="projects" aria-labelledby="projects-title">
+      <div className="container">
+        <div className="section-heading" data-reveal><h2 id="projects-title" data-butterfly-perch="projects">Projects</h2></div>
+        <div className="project-toolbar" data-reveal style={{ '--reveal-delay': '60ms' }}>
+          <div className="project-filters" role="group" aria-label="Filter projects" data-sound="project">{projectCategories.map(({ id, label }) => <button key={id} type="button" aria-pressed={category === id} onClick={() => filterProjects(id)}>{label}</button>)}</div>
+          <p className="project-count" aria-live="polite">{visible.length} {visible.length === 1 ? 'project' : 'projects'}</p>
+        </div>
+        <div className="project-showcase" role="region" aria-roledescription="carousel" aria-label="Project showcase" data-reveal style={{ '--reveal-delay': '120ms' }}>
+          <div key={category} ref={trackRef} id="project-slides" className="project-track" tabIndex={0} aria-label="Project slides. Use Left and Right arrow keys to browse." onKeyDown={handleKeyDown} onPointerDown={() => { pendingIndex.current = null; }} onWheel={() => { pendingIndex.current = null; }}>
+            {visible.map((project, index) => <ProjectCard key={project.id} project={project} index={index} total={visible.length} active={index === activeIndex} />)}
+          </div>
+          <div className="project-carousel-controls" data-sound="project">
+            <p className="project-position" aria-live="polite"><span className="visually-hidden">Project </span>{String(activeIndex + 1).padStart(2, '0')}<span aria-hidden="true"> / </span><span className="visually-hidden"> of </span>{String(visible.length).padStart(2, '0')}</p>
+            <div className="project-jump" role="group" aria-labelledby="project-jump-label">
+              <p className="project-jump-label" id="project-jump-label">Jump to project</p>
+              <div className="project-pagination">{visible.map((project, index) => <button key={project.id} type="button" aria-label={'Go to project ' + (index + 1) + ': ' + project.title} title={project.title} aria-pressed={activeIndex === index} onClick={() => goTo(index)}><span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span></button>)}</div>
+            </div>
+            <div className="project-arrows"><button type="button" aria-label="Previous project" aria-controls="project-slides" disabled={activeIndex === 0} onClick={() => goTo(activeIndex - 1)}><ArrowLeft aria-hidden="true" /></button><button type="button" aria-label="Next project" aria-controls="project-slides" disabled={activeIndex === visible.length - 1} onClick={() => goTo(activeIndex + 1)}><ArrowRight aria-hidden="true" /></button></div>
+          </div>
+        </div>
+      </div>
     </section>
-    );
-}
+  );
+};
 
 export default Project;

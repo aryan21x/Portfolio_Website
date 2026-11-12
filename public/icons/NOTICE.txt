@@ -1,0 +1,8 @@
+Skill icons are from Devicon, licensed under the MIT License.
+Source: https://github.com/devicons/devicon
+Version: v2.17.0
+Commit: 54cfe13ac10eaa1ef817a343ab0a9437eb3c2e08
+The full license is in LICENSE.devicon.txt in this directory.
+
+Product names and logos belong to their respective owners. They identify
+technologies used in the portfolio and do not imply endorsement.

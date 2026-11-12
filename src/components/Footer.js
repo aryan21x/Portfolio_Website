@@ -1,17 +1,16 @@
-import { Container } from 'react-bootstrap';
-import SocialLinks from './SocialLinks';
+import { ArrowUp } from 'react-bootstrap-icons';
+
+const email = 'aryanraval4014@gmail.com';
 
 const Footer = () => (
-  <footer className="footer" id="footer">
-    <Container>
-      <div className="footer-content">
-        <SocialLinks />
-        <a className="footer-email" href="mailto:aryanraval4014@gmail.com">
-          aryanraval4014@gmail.com
-        </a>
-        <p>Copyright {new Date().getFullYear()}. All Rights Reserved.</p>
+  <footer className="footer" id="footer" aria-label="Contact">
+    <div className="container footer-content">
+      <div className="footer-details">
+        <div className="footer-email-row"><span>Email:</span><a className="footer-email" href={'mailto:' + email}>{email}</a></div>
+        <p className="footer-copyright">© 2026 Aryan Raval. All rights reserved.</p>
       </div>
-    </Container>
+      <a className="button button-light footer-back-to-top" href="#home" data-sound="action">Back to top <ArrowUp aria-hidden="true" /></a>
+    </div>
   </footer>
 );
 
