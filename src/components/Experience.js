@@ -1,9 +1,11 @@
 import { useEffect, useRef } from 'react';
-import { Calendar3, GeoAlt } from 'react-bootstrap-icons';
+import { Calendar3, ChevronUp, GeoAlt } from 'react-bootstrap-icons';
 import { experiences } from '../data/portfolio';
 import { interfaceSounds } from '../utils/interfaceSounds';
+import useMobileLayout from '../hooks/useMobileLayout';
+import { MobileDisclosure } from './MobileDisclosure';
 
-const Experience = () => {
+const useExperienceTimeline = () => {
   const timelineRef = useRef(null);
 
   useEffect(() => {
@@ -26,7 +28,9 @@ const Experience = () => {
       // Layout offsets stay stable while the cards animate with transforms.
       centers = steps.map((step) => {
         const node = step.querySelector('.experience-node');
-        return step.offsetTop + node.offsetTop + node.offsetHeight / 2;
+        let center = step.offsetTop + node.offsetHeight / 2;
+        for (let part = node; part && part !== step; part = part.offsetParent) center += part.offsetTop;
+        return center;
       });
       start = centers[0];
       length = centers[centers.length - 1] - start;
@@ -127,6 +131,12 @@ const Experience = () => {
     };
   }, []);
 
+  return timelineRef;
+};
+
+const DesktopExperience = () => {
+  const timelineRef = useExperienceTimeline();
+
   return (
     <section className="experience section" id="experience" aria-labelledby="experience-title">
       <div className="container">
@@ -145,11 +155,15 @@ const Experience = () => {
                   </div>
                   <article className="experience-entry" aria-labelledby={'experience-company-' + index}>
                     <div className="experience-content">
-                      <header className="experience-heading">
-                        <h3 id={'experience-company-' + index}>{experience.company}</h3>
-                        <p className="experience-role">{experience.role}</p>
-                      </header>
-                      <ul className="experience-highlights">{experience.highlights.map((highlight) => <li key={highlight}>{highlight}</li>)}</ul>
+                      <MobileDisclosure
+                        id={'experience-details-' + index}
+                        titleId={'experience-company-' + index}
+                        mobile={false}
+                        headingClassName="experience-heading"
+                        heading={<><h3 id={'experience-company-' + index}><span>{experience.company}</span></h3><p className="experience-role"><span>{experience.role}</span></p></>}
+                      >
+                        <ul className="experience-highlights">{experience.highlights.map((highlight) => <li key={highlight}>{highlight}</li>)}</ul>
+                      </MobileDisclosure>
                     </div>
                   </article>
                 </li>
@@ -160,6 +174,57 @@ const Experience = () => {
       </div>
     </section>
   );
+};
+
+const MobileExperience = () => {
+  const timelineRef = useExperienceTimeline();
+  return (
+    <section className="experience section mobile-work-section" id="experience" aria-labelledby="experience-title">
+      <div className="container">
+        <div className="section-heading mobile-section-heading"><h2 id="experience-title" data-butterfly-perch="experience">Experience</h2><span className="mobile-section-count" data-butterfly-avoid>{experiences.length} roles</span></div>
+        <div className="experience-timeline mobile-work-timeline" ref={timelineRef}>
+          <ol className="experience-list mobile-work-list" aria-label="Work experience, most recent first">
+            {experiences.map((experience, index) => (
+              <li className="experience-step mobile-work-step" key={experience.company}>
+                <article className="mobile-work-card" aria-labelledby={'experience-company-' + index}>
+                  <MobileDisclosure
+                    id={'experience-details-' + index}
+                    titleId={'experience-company-' + index}
+                    mobile
+                    headingClassName="mobile-work-heading"
+                    preview={experience.highlights[0]}
+                    actionLabels={{ closed: 'Read experience', open: 'Close details' }}
+                    heading={<>
+                      <div className="mobile-work-identity">
+                        <span className="experience-node mobile-work-logo" data-butterfly-avoid><img src={process.env.PUBLIC_URL + experience.logo} alt={experience.company + ' logo'} width="48" height="48" loading="lazy" /></span>
+                        <div data-butterfly-avoid><h3 id={'experience-company-' + index}>{experience.company}</h3><p>{experience.role}</p></div>
+                      </div>
+                      <div className="mobile-work-meta">
+                        <p className="mobile-work-date" data-butterfly-avoid><Calendar3 aria-hidden="true" />{experience.dates}</p>
+                        <span className="mobile-work-location" data-butterfly-avoid><GeoAlt aria-hidden="true" />{experience.location}</span>
+                      </div>
+                    </>}
+                  >
+                    {(close) => <>
+                      <ul className="experience-highlights">{experience.highlights.map((highlight) => <li key={highlight}>{highlight}</li>)}</ul>
+                      <p className="mobile-work-tech-label" data-butterfly-avoid>Technologies</p>
+                      <ul className="tag-list experience-technologies mobile-work-tags" aria-label="Technologies used">{experience.tags.map((tag) => <li key={tag}>{tag}</li>)}</ul>
+                      <button type="button" className="mobile-details-close" onClick={close} data-butterfly-avoid>Close details <ChevronUp aria-hidden="true" /></button>
+                    </>}
+                  </MobileDisclosure>
+                </article>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const Experience = () => {
+  const mobile = useMobileLayout();
+  return mobile ? <MobileExperience /> : <DesktopExperience />;
 };
 
 export default Experience;

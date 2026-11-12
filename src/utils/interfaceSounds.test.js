@@ -1,5 +1,6 @@
 import { createInterfaceSounds, handleInterfaceClick, interfaceSounds } from './interfaceSounds';
 
+const audioSessionDescriptor = Object.getOwnPropertyDescriptor(navigator, 'audioSession');
 const parameter = () => ({ value: 0, setValueAtTime: jest.fn(), exponentialRampToValueAtTime: jest.fn() });
 const node = () => ({ connect: jest.fn(), disconnect: jest.fn() });
 const source = () => ({ ...node(), start: jest.fn(), stop: jest.fn(), frequency: parameter() });
@@ -22,7 +23,69 @@ const fakeContext = () => {
 };
 
 beforeEach(() => jest.spyOn(document, 'hidden', 'get').mockReturnValue(false));
-afterEach(() => jest.restoreAllMocks());
+afterEach(() => {
+  jest.restoreAllMocks();
+  if (audioSessionDescriptor) Object.defineProperty(navigator, 'audioSession', audioSessionDescriptor);
+  else delete navigator.audioSession;
+});
+
+test('selects iPhone media playback only after enabling sound and restores the session on mute', () => {
+  const session = { type: 'auto' };
+  Object.defineProperty(navigator, 'audioSession', { configurable: true, value: session });
+  const context = fakeContext();
+  const sounds = createInterfaceSounds(() => {
+    expect(session.type).toBe('playback');
+    return context;
+  });
+  expect(session.type).toBe('auto');
+  sounds.setEnabled(true);
+  expect(session.type).toBe('auto');
+  expect(sounds.unlock({ retry: true })).toBe(true);
+  expect(sounds.play('click')).toBe(true);
+  sounds.setEnabled(false);
+  expect(session.type).toBe('auto');
+  expect(sounds.play('click')).toBe(false);
+  sounds.setEnabled(true);
+  expect(session.type).toBe('playback');
+  sounds.dispose();
+  expect(session.type).toBe('auto');
+});
+
+test('reapplies playback after an iPhone interruption without losing the original session type', () => {
+  const session = { type: 'transient' };
+  Object.defineProperty(navigator, 'audioSession', { configurable: true, value: session });
+  const context = fakeContext();
+  const sounds = createInterfaceSounds(() => context);
+  sounds.setEnabled(true);
+  sounds.unlock({ retry: true });
+  context.changeState('interrupted');
+  session.type = 'ambient';
+  expect(sounds.unlock({ retry: true })).toBe(true);
+  expect(session.type).toBe('playback');
+  sounds.setEnabled(false);
+  expect(session.type).toBe('transient');
+  sounds.dispose();
+});
+
+test('keeps ordinary Web Audio available if the experimental audio-session setting is rejected', () => {
+  const session = { get type() { return 'auto'; }, set type(value) { throw new Error('Setting unavailable'); } };
+  Object.defineProperty(navigator, 'audioSession', { configurable: true, value: session });
+  const sounds = createInterfaceSounds(fakeContext);
+  sounds.setEnabled(true);
+  expect(sounds.unlock({ retry: true })).toBe(true);
+  expect(sounds.play('click')).toBe(true);
+  expect(() => sounds.dispose()).not.toThrow();
+});
+
+test('releases the playback session when the browser cannot create an audio context', () => {
+  const session = { type: 'auto' };
+  Object.defineProperty(navigator, 'audioSession', { configurable: true, value: session });
+  const sounds = createInterfaceSounds(() => null);
+  sounds.setEnabled(true);
+  expect(sounds.unlock({ retry: true })).toBe(false);
+  expect(session.type).toBe('auto');
+  sounds.dispose();
+});
 
 test('reports waiting, playing, and muted states so the speaker reflects browser playback', () => {
   const context = fakeContext();
@@ -140,17 +203,15 @@ test('plays distinct interface cues and limits rapid repeated clicks', () => {
   sounds.dispose();
 });
 
-test('plays a brief skills reveal cue through the shared sound controls', () => {
+test('ignores the removed skills cue while keeping click effects available', () => {
   const context = fakeContext();
   const sounds = createInterfaceSounds(() => context);
   sounds.setEnabled(true);
   sounds.unlock();
-  expect(sounds.play('skills')).toBe(true);
-  expect(context.createOscillator).toHaveBeenCalledTimes(1);
-  expect(context.createBufferSource).toHaveBeenCalledTimes(1);
   expect(sounds.play('skills')).toBe(false);
-  sounds.setEnabled(false);
-  expect(sounds.play('skills')).toBe(false);
+  expect(context.createOscillator).not.toHaveBeenCalled();
+  expect(context.createBufferSource).not.toHaveBeenCalled();
+  expect(sounds.play('click')).toBe(true);
   sounds.dispose();
 });
 

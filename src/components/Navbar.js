@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react';
-import logo from '../assets/img/AnR2.svg';
 import SocialLinks from './SocialLinks';
 import SoundToggle from './SoundToggle';
 
@@ -54,7 +53,6 @@ const CustomNavbar = () => {
   return (
     <header className={'site-header' + (scrolled ? ' is-scrolled' : '') + (expanded ? ' is-menu-open' : '')} onKeyDown={handleEscape}>
       <nav className="container navigation" aria-label="Main navigation" data-sound="navigation">
-        <a className="site-logo" href="#home" aria-label="Aryan Raval home" onClick={closeMenu}><img src={logo} alt="" width="56" height="56" /></a>
         <button ref={toggleRef} className={'menu-toggle' + (expanded ? ' is-open' : '')} type="button" aria-label="Toggle navigation" aria-expanded={expanded} aria-controls="primary-navigation" onClick={() => setExpanded((value) => !value)}><span /><span /><span /></button>
         <div className={'nav-menu' + (expanded ? ' is-open' : '')} id="primary-navigation">
           <ul className="nav-links">{links.map(({ id, label }) => <li key={id}><a href={'#' + id} onClick={closeMenu} aria-current={activeSection === id ? 'location' : undefined}>{label}</a></li>)}</ul>

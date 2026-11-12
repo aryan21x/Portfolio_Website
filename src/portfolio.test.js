@@ -86,7 +86,7 @@ test('routes navbar and social links to one cue, and resume/contact/back links t
     expect(sound).toHaveBeenCalledTimes(1);
     expect(sound).toHaveBeenCalledWith(cue);
   };
-  ['Aryan Raval home', 'Home', 'About', 'Experience', 'Skills', 'Projects', 'GitHub', 'LinkedIn'].forEach((name) => checkCue(name, 'navigation'));
+  ['Home', 'About', 'Experience', 'Skills', 'Projects', 'GitHub', 'LinkedIn'].forEach((name) => checkCue(name, 'navigation'));
   ['Resume', 'Read about Degree Planner in my resume', "Let's Connect", 'Back to top'].forEach((name) => checkCue(name, 'action'));
   checkCue('Learn more about me', 'click');
   sound.mockRestore();

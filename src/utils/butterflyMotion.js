@@ -4,7 +4,7 @@ const between = (low, high, random) => low + (high - low) * random();
 export const butterflyCount = (width) => width < 768 ? 10 : width < 1600 ? 15 : 20;
 
 const textRectangles = (viewport, size) => (viewport.obstacles || []).map((box) => {
-  const gap = viewport.width < 768 ? 7 : 11;
+  const gap = viewport.width < 768 ? 4 : 11;
   return { left: box.x - size - gap, right: box.x + box.width + gap, top: box.y - viewport.scrollY - size - gap, bottom: box.y + box.height - viewport.scrollY + gap };
 }).filter((box) => box.right > 0 && box.left < viewport.width && box.bottom > viewport.headerHeight && box.top < viewport.height);
 
@@ -15,7 +15,7 @@ const segmentClear = (from, to, boxes) => !boxes.some((box) => {
   let high = 1;
   for (const [key, min, max] of [['x', box.left, box.right], ['y', box.top, box.bottom]]) {
     const delta = to[key] - from[key];
-    if (Math.abs(delta) < 0.0001) {
+    if (Math.abs(delta) < 1e-9) {
       if (from[key] <= min || from[key] >= max) return false;
     } else {
       const first = (min - from[key]) / delta;
@@ -28,15 +28,15 @@ const segmentClear = (from, to, boxes) => !boxes.some((box) => {
   return high > 0 && low < 1;
 });
 
-const corners = (boxes) => boxes.flatMap((box) => [
-  { x: box.left - 12, y: box.top - 12 }, { x: box.right + 12, y: box.top - 12 },
-  { x: box.left - 12, y: box.bottom + 12 }, { x: box.right + 12, y: box.bottom + 12 },
+const corners = (boxes, clearance = 12) => boxes.flatMap((box) => [
+  { x: box.left - clearance, y: box.top - clearance }, { x: box.right + clearance, y: box.top - clearance },
+  { x: box.left - clearance, y: box.bottom + clearance }, { x: box.right + clearance, y: box.bottom + clearance },
 ]);
 const within = (point, bounds) => point.x >= bounds.left && point.x <= bounds.right && point.y >= bounds.top && point.y <= bounds.bottom;
-const nearestOpenPoint = (point, bounds, boxes) => {
+const nearestOpenPoint = (point, bounds, boxes, clearance = 12) => {
   const clamped = { x: clamp(point.x, bounds.left, bounds.right), y: clamp(point.y, bounds.top, bounds.bottom) };
   if (!inside(clamped, boxes)) return clamped;
-  const candidates = corners(boxes);
+  const candidates = corners(boxes, clearance);
   for (let row = 0; row <= 8; row += 1) {
     for (let column = 0; column <= 8; column += 1) candidates.push({ x: bounds.left + (bounds.right - bounds.left) * column / 8, y: bounds.top + (bounds.bottom - bounds.top) * row / 8 });
   }
@@ -49,14 +49,19 @@ export function planButterflyPath(from, target, viewport, size) {
   const bounds = butterflyBounds(viewport, size);
   if (!bounds.visible) return [];
   const boxes = textRectangles(viewport, size);
-  const end = nearestOpenPoint(target, bounds, boxes);
+  const clearance = viewport.width < 768 ? 2 : 12;
+  const end = nearestOpenPoint(target, bounds, boxes, clearance);
   if (!end) return [];
   if (inside(from, boxes) || !within(from, bounds)) {
-    const escape = nearestOpenPoint(from, bounds, boxes);
-    return escape ? [escape, ...planButterflyPath(escape, end, viewport, size)] : [];
+    // Scrolling can put a phone flyer inside new copy. It is already hidden;
+    // let the follower fade it back in at the clear destination.
+    if (viewport.width < 768 && inside(from, boxes)) return [end];
+    const escape = nearestOpenPoint(from, bounds, boxes, clearance);
+    const path = escape ? planButterflyPath(escape, end, viewport, size) : [];
+    return path.length ? [escape, ...path] : [];
   }
   if (segmentClear(from, end, boxes)) return [end];
-  const nodes = [from, end, ...corners(boxes).filter((point) => within(point, bounds) && !inside(point, boxes))];
+  const nodes = [from, end, ...corners(boxes, clearance).filter((point) => within(point, bounds) && !inside(point, boxes))];
   const costs = nodes.map(() => Infinity);
   const parents = nodes.map(() => -1);
   const visited = new Set();
@@ -85,6 +90,8 @@ export function planButterflyPath(from, target, viewport, size) {
 export function butterflyContentOpacity(position, viewport, size = position.width) {
   const boxes = textRectangles(viewport, size);
   if (inside(position, boxes)) return 0;
+  // Narrow phone gaps already include the text clearance above.
+  if (viewport.width < 768) return 1;
   const clearance = boxes.reduce((nearest, box) => Math.min(nearest, Math.hypot(Math.max(box.left - position.x, 0, position.x - box.right), Math.max(box.top - position.y, 0, position.y - box.bottom))), Infinity);
   return clamp(clearance / 10, 0, 1);
 }
@@ -100,9 +107,17 @@ export function createButterflyBurst(origin, viewport, sizes, random = Math.rand
     const reachX = Math.abs(dx) < 0.00001 ? Infinity : ((dx > 0 ? bounds.right : bounds.left) + size / 2 - origin.x) / dx;
     const reachY = Math.abs(dy) < 0.00001 ? Infinity : ((dy > 0 ? bounds.bottom : bounds.top) + size / 2 - origin.y) / dy;
     const reach = Math.max(0, Math.min(reachX, reachY));
-    const towardEdge = index % 4 !== 3;
-    const spread = reach * (towardEdge ? between(0.86, 0.96, random) : between(0.38, 0.74, random));
+    const mobile = viewport.width < 768;
+    const towardEdge = !mobile && index % 4 !== 3;
+    const spread = reach * (mobile ? between(0.5, 0.95, random) : towardEdge ? between(0.86, 0.96, random) : between(0.38, 0.74, random));
     const desired = { x: origin.x + dx * spread - size / 2, y: origin.y + dy * spread - size / 2 };
+    if (mobile) {
+      // A deep scroll can put the hero origin above the viewport. Distribute
+      // the burst through open spaces rather than collapsing upward rays at it.
+      const rows = Math.ceil(sizes.length / 3);
+      desired.x = bounds.left + (bounds.right - bounds.left) * (index % 3 + random()) / 3;
+      desired.y = bounds.top + (bounds.bottom - bounds.top) * (Math.floor(index / 3) + random()) / rows;
+    }
     if (towardEdge) {
       const edge = edgeIndex++ % 4;
       if (edge < 2) {
@@ -113,7 +128,7 @@ export function createButterflyBurst(origin, viewport, sizes, random = Math.rand
         desired.y = edge === 2 ? bounds.top + 12 : bounds.bottom - 12;
       }
     }
-    let point = nearestOpenPoint(desired, bounds, textRectangles(viewport, size)) || { x: origin.x - size / 2, y: origin.y - size / 2 };
+    let point = nearestOpenPoint(desired, bounds, textRectangles(viewport, size), mobile ? 2 : 12) || { x: origin.x - size / 2, y: origin.y - size / 2 };
     const path = planButterflyPath({ x: origin.x - size / 2, y: origin.y - size / 2 }, point, viewport, size);
     if (path.length) point = path[path.length - 1];
     return { ...point, path, width: size, bank: between(-24, 24, random), angle: Math.atan2(point.y + size / 2 - origin.y, point.x + size / 2 - origin.x) };
@@ -147,9 +162,10 @@ export function sampleButterflyBurst(from, to, progress, inward = false) {
   };
 }
 
-// Keep a generous inset on both sides. The footer is outside the flight area.
+// Keep complete wings on screen. Phone flights use open content space instead
+// of clipping to the side gutters; the footer remains outside the flight area.
 export function butterflyBounds(viewport, size) {
-  const inset = Math.min(120, Math.max(24, viewport.width * 0.06));
+  const inset = viewport.width < 768 ? 12 : Math.min(120, Math.max(24, viewport.width * 0.06));
   const top = viewport.headerHeight + 20;
   const bottom = Math.min(viewport.height - 28, viewport.contentBottom - viewport.scrollY - 28) - size;
   return { left: inset, right: Math.max(inset, viewport.width - inset - size), top, bottom, visible: bottom > top + 16 };
@@ -166,6 +182,9 @@ const nearHighlight = (anchor, viewport, size, random) => {
   const { box, kind } = anchor;
   const top = box.y - viewport.scrollY;
   const gap = viewport.width < 768 ? 9 : 18;
+  if (viewport.width < 768 && (kind === 'picture' || kind === 'portrait')) {
+    return { x: between(box.x + box.width * 0.15, box.x + box.width * 0.85 - size, random), y: between(top + box.height * 0.15, top + box.height * 0.85 - size, random) };
+  }
   if (kind === 'area') {
     const bounds = butterflyBounds(viewport, size);
     return {
@@ -180,7 +199,7 @@ const nearHighlight = (anchor, viewport, size, random) => {
       y: top + box.height / 2 + Math.sin(angle) * (box.height / 2 + gap) - size / 2,
     };
   }
-  const side = Math.floor(random() * (kind === 'picture' ? 4 : 3));
+  const side = Math.floor(random() * (kind === 'picture' || kind === 'detail' ? 4 : 3));
   if (side === 0) return { x: box.x - size - gap, y: top + between(0, box.height, random) - size / 2 };
   if (side === 1) return { x: box.x + box.width + gap, y: top + between(0, box.height, random) - size / 2 };
   return { x: box.x + between(-size * 0.3, box.width - size * 0.7, random), y: side === 2 ? top - size - gap : top + box.height + gap };
@@ -206,7 +225,8 @@ const nearViewportEdge = (viewport, size, random, from) => {
 export function chooseButterflyTarget(anchors, viewport, size, occupied = [], previousAnchor, random = Math.random, from) {
   const bounds = butterflyBounds(viewport, size);
   if (!bounds.visible) return null;
-  const preferEdge = random() < 0.75;
+  const mobile = viewport.width < 768;
+  const preferEdge = !mobile && random() < 0.75;
   const visible = visibleButterflyAnchors(anchors, viewport, size);
   const highlights = visible.filter((anchor) => anchor.kind !== 'area');
   const spaces = visible.filter((anchor) => anchor.kind === 'area');
@@ -216,9 +236,13 @@ export function chooseButterflyTarget(anchors, viewport, size, occupied = [], pr
   let choice;
   for (let attempt = 0; attempt < 24; attempt += 1) {
     const anchor = candidates[Math.floor(random() * candidates.length)] || fallback;
-    // Try the open perimeter first for most flights; preserve highlight visits
-    // and fall back to them when text blocks the outer area.
-    const point = preferEdge && attempt < 18 ? nearViewportEdge(viewport, size, random, from) : nearHighlight(anchor, viewport, size, random);
+    // Phones mix flights around visible details with fresh points throughout
+    // the viewport, rejecting any destination or route that covers text.
+    const wander = mobile && (attempt >= 12 || random() < 0.45);
+    const local = wander && from && random() < 0.7;
+    const radius = Math.min(180, viewport.height * 0.25);
+    const point = wander ? { x: between(bounds.left, bounds.right, random), y: between(local ? Math.max(bounds.top, from.y - radius) : bounds.top, local ? Math.min(bounds.bottom, from.y + radius) : bounds.bottom, random) }
+      : preferEdge && attempt < 18 ? nearViewportEdge(viewport, size, random, from) : nearHighlight(anchor, viewport, size, random);
     const x = clamp(point.x, bounds.left, bounds.right);
     const y = clamp(point.y, bounds.top, bounds.bottom);
     if (butterflyContentOpacity({ x, y }, viewport, size) < 1) continue;
@@ -228,7 +252,7 @@ export function chooseButterflyTarget(anchors, viewport, size, occupied = [], pr
     if (occupied.every((other) => Math.hypot(other.x - x, other.y - y) > size + 16)) break;
   }
   if (choice) return choice;
-  const open = nearestOpenPoint(from || { x: viewport.width / 2, y: viewport.height / 2 }, bounds, textRectangles(viewport, size));
+  const open = nearestOpenPoint(from || { x: viewport.width / 2, y: viewport.height / 2 }, bounds, textRectangles(viewport, size), mobile ? 2 : 12);
   return open ? { ...open, anchorId: null, perch: 'open-space', duration: 3000, path: from ? planButterflyPath(from, open, viewport, size) : null } : null;
 }
 

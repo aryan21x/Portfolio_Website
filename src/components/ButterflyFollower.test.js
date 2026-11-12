@@ -118,11 +118,80 @@ test('ten small butterflies keep moving around phone highlights without further 
   flyers.forEach((flyer, index) => {
     const [x, y] = coordinates(flyer);
     expect(Math.hypot(x - before[index][0], y - before[index][1])).toBeGreaterThan(1);
-    expect(x).toBeGreaterThanOrEqual(24);
-    expect(x + butterflyWidth(flyer)).toBeLessThanOrEqual(375 - 24 + 0.01);
+    const width = butterflyWidth(flyer);
+    expect(x).toBeGreaterThanOrEqual(12);
+    expect(x + width).toBeLessThanOrEqual(375 - 12 + 0.01);
     expect(y).toBeGreaterThanOrEqual(80);
   });
   expect(nextFrame).not.toBeNull();
+  unmount();
+});
+
+test('roams through open mobile experience space around dates, tags, and closed cards', () => {
+  fixture.insertAdjacentHTML('afterbegin', '<main><section id="experience"></section></main>');
+  const main = fixture.querySelector('main');
+  const experience = fixture.querySelector('#experience');
+  setBox(main, 0, 0, 375, 3000);
+  setBox(experience, 844, 0, 375, 2156, main);
+  for (let index = 0; index < 3; index += 1) {
+    experience.insertAdjacentHTML('beforeend', '<div class="experience-step"><p class="experience-date">Dates</p><ul class="experience-technologies"><li>React</li><li>SQL</li></ul><div class="experience-content"><header class="experience-heading"><h3><span>Company</span></h3><p class="experience-role"><span>Software Engineer</span></p><span class="disclosure-chevron"></span></header></div></div>');
+    const step = experience.lastElementChild;
+    setBox(step, index * 330, 0, 375, 290, experience);
+    setBox(step.querySelector('.experience-date'), 0, 84, 200, 40, step);
+    const tags = step.querySelector('.experience-technologies');
+    setBox(tags, 58, 84, 230, 28, step);
+    tags.querySelectorAll('li').forEach((tag, tagIndex) => setBox(tag, 0, tagIndex * 80, 60, 28, tags));
+    const header = step.querySelector('header');
+    setBox(header, 144, 20, 335, 100, step);
+    const title = header.querySelector('h3');
+    setBox(title, 20, 20, 250, 30, header);
+    setBox(title.querySelector('span'), 0, 0, 170, 30, title);
+    const role = header.querySelector('p');
+    setBox(role, 54, 20, 200, 24, header);
+    setBox(role.querySelector('span'), 0, 0, 180, 24, role);
+    setBox(header.querySelector('.disclosure-chevron'), 25, 280, 32, 32, header);
+  }
+  const { container, unmount } = mount();
+  scrollTo(1000);
+  runFrames(2500);
+  const flyers = Array.from(container.querySelectorAll('.butterfly-companion:not([hidden])'));
+  const before = flyers.map(coordinates);
+  expect(flyers).toHaveLength(10);
+  expect(before.filter(([x]) => x > 45 && x < 300).length).toBeGreaterThanOrEqual(5);
+  flyers.forEach((flyer) => {
+    const [x] = coordinates(flyer);
+    const width = butterflyWidth(flyer);
+    expect(Number(flyer.style.opacity)).toBeGreaterThan(0.9);
+    expect(x).toBeGreaterThanOrEqual(12);
+    expect(x + width).toBeLessThanOrEqual(375 - 12 + 0.01);
+  });
+  runFrames(2500);
+  expect(flyers.filter((flyer, index) => Math.hypot(coordinates(flyer)[0] - before[index][0], coordinates(flyer)[1] - before[index][1]) > 5).length).toBeGreaterThanOrEqual(8);
+  unmount();
+});
+
+test('keeps mobile section descriptions clear during the burst and subsequent flights', () => {
+  fixture.insertAdjacentHTML('afterbegin', '<main><section id="skills"><div class="section-heading"><h2>Skills</h2><p>Languages, frameworks, and tools I have used.</p></div></section></main>');
+  const main = fixture.querySelector('main');
+  const skills = fixture.querySelector('#skills');
+  setBox(main, 0, 0, 375, 2200);
+  setBox(skills, 844, 0, 375, 1356, main);
+  const heading = skills.querySelector('.section-heading');
+  setBox(heading, 100, 20, 335, 120, skills);
+  setBox(heading.querySelector('h2'), 0, 100, 135, 45, heading);
+  setBox(heading.querySelector('p'), 60, 0, 335, 54, heading);
+  const { container, unmount } = mount();
+  scrollTo(844);
+  const flyers = Array.from(container.querySelectorAll('.butterfly-companion:not([hidden])'));
+  for (let frame = 0; frame < 180; frame += 1) {
+    runFrames(16);
+    flyers.filter((flyer) => Number(flyer.style.opacity) > 0.1).forEach((flyer) => {
+      const [x, y] = coordinates(flyer);
+      const width = butterflyWidth(flyer);
+      expect(x + width <= 16 || x >= 359 || y + width <= 156 || y >= 218).toBe(true);
+    });
+  }
+  expect(flyers.filter((flyer) => Number(flyer.style.opacity) > 0.1).length).toBeGreaterThanOrEqual(6);
   unmount();
 });
 

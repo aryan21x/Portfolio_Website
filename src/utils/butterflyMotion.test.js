@@ -169,3 +169,58 @@ test('fades instead of covering text when a phone viewport has no open passage',
   expect(chooseButterflyTarget([], view, 32, [], null, seededRandom(), { x: 100, y: 100 })).toBeNull();
   expect(butterflyContentOpacity({ x: 100, y: 100, width: 32 }, view)).toBe(0);
 });
+
+test.each([320, 375, 430])('finds varied open destinations around mobile dates and skill chips at %i px', (width) => {
+  const date = { x: 80, y: 180, width: 180, height: 40 };
+  const chip = { x: 84, y: 248, width: 60, height: 28 };
+  const view = { ...viewport, width, height: 844, scrollY: 0, obstacles: [date, chip, { x: 40, y: 390, width: width - 80, height: 100 }] };
+  const anchors = [{ id: 'date', kind: 'detail', perch: 'experience', box: date }, { id: 'chip', kind: 'detail', perch: 'experience', box: chip }];
+  const random = seededRandom();
+  const size = 24;
+  const bounds = butterflyBounds(view, size);
+  const from = { x: 45, y: 110, width: size, bank: 0, opacity: 1 };
+  const targets = Array.from({ length: 50 }, () => chooseButterflyTarget(anchors, view, size, [], null, random, from));
+  targets.forEach((target) => {
+    expect(target).not.toBeNull();
+    expect(butterflyContentOpacity(target, view, size)).toBe(1);
+    expect(target.path.length).toBeGreaterThan(0);
+    expect(target.x).toBeGreaterThanOrEqual(bounds.left);
+    expect(target.x + size).toBeLessThanOrEqual(width - bounds.left);
+    for (let frame = 0; frame <= 20; frame += 1) {
+      const pose = sampleButterflyBurst(from, { ...target, width: size, bank: 0 }, frame / 20);
+      expect(butterflyContentOpacity(pose, view)).toBe(1);
+    }
+  });
+  expect(new Set(targets.map(({ x, y }) => x.toFixed(1) + ',' + y.toFixed(1))).size).toBeGreaterThan(40);
+  expect(targets.filter(({ x }) => x > 40 && x + size < width - 40).length).toBeGreaterThan(25);
+});
+
+test('lets phone butterflies visit images and wander across the interior of the screen', () => {
+  const view = { ...viewport, width: 390, height: 844, scrollY: 0 };
+  const picture = { id: 'photo', perch: 'portrait', kind: 'portrait', box: { x: 95, y: 200, width: 200, height: 200 } };
+  const random = seededRandom();
+  const targets = Array.from({ length: 120 }, () => chooseButterflyTarget([picture], view, 24, [], null, random));
+  const imageVisits = targets.filter(({ x, y }) => x > 95 && x + 24 < 295 && y > 200 && y + 24 < 400);
+  expect(imageVisits.length).toBeGreaterThan(20);
+  expect(imageVisits.length).toBeLessThan(100);
+  expect(targets.filter(({ x }) => x > 45 && x + 24 < 345).length).toBeGreaterThan(85);
+});
+
+test('spreads a mobile burst through the viewport when the hero is above it', () => {
+  const view = { ...viewport, width: 375, height: 844, scrollY: 0, obstacles: [
+    { x: 95, y: 145, width: 185, height: 45 },
+    { x: 84, y: 240, width: 180, height: 40 },
+    { x: 40, y: 410, width: 180, height: 65 },
+  ] };
+  const rays = createButterflyBurst({ x: 260, y: -900 }, view, Array(10).fill(24), seededRandom());
+  expect(Math.max(...rays.map(({ y }) => y)) - Math.min(...rays.map(({ y }) => y))).toBeGreaterThan(400);
+  expect(Math.max(...rays.map(({ x }) => x)) - Math.min(...rays.map(({ x }) => x))).toBeGreaterThan(220);
+  rays.forEach((ray) => expect(butterflyContentOpacity(ray, view)).toBe(1));
+});
+
+test('does not mistake a partial escape for a route across a full-width mobile paragraph', () => {
+  const view = { ...viewport, width: 375, height: 844, scrollY: 0, obstacles: [{ x: 20, y: 180, width: 335, height: 54 }] };
+  expect(planButterflyPath({ x: 160, y: -500 }, { x: 160, y: 450 }, view, 24)).toEqual([]);
+  const rays = createButterflyBurst({ x: 260, y: -900 }, view, Array(10).fill(24), seededRandom());
+  expect(rays.filter(({ y }) => y > 240).length).toBeGreaterThanOrEqual(6);
+});

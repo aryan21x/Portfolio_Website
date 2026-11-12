@@ -2,16 +2,19 @@ import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, ArrowRight } from 'react-bootstrap-icons';
 import { projectCategories, projects } from '../data/portfolio';
 import { ProjectCard } from './ProjectCard';
+import { ProjectFilter } from './ProjectFilter';
 import { interfaceSounds } from '../utils/interfaceSounds';
+import useMobileLayout from '../hooks/useMobileLayout';
+import { MobileProjects } from './MobileProjects';
 
-const Project = () => {
-  const [category, setCategory] = useState('all');
+const DesktopProject = ({ category, setCategory }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef(null);
   const activeRef = useRef(0);
   const pendingIndex = useRef(null);
   const scrollFrame = useRef(null);
   const visible = projects.filter((project) => category === 'all' || project.category === category);
+  const categoryLabel = projectCategories.find((item) => item.id === category).label;
 
   useEffect(() => {
     const track = trackRef.current;
@@ -95,9 +98,15 @@ const Project = () => {
   return (
     <section className="projects section" id="projects" aria-labelledby="projects-title">
       <div className="container">
-        <div className="section-heading" data-reveal><h2 id="projects-title" data-butterfly-perch="projects">Projects</h2></div>
+        <div className="section-heading projects-heading" data-reveal>
+          <div className="projects-heading-row">
+            <h2 id="projects-title" data-butterfly-perch="projects">Projects</h2>
+            <ProjectFilter category={category} onChange={filterProjects} />
+          </div>
+          <p className="project-mobile-category" aria-live="polite">{categoryLabel} · {visible.length} {visible.length === 1 ? 'project' : 'projects'}</p>
+        </div>
         <div className="project-toolbar" data-reveal style={{ '--reveal-delay': '60ms' }}>
-          <div className="project-filters" role="group" aria-label="Filter projects" data-sound="project">{projectCategories.map(({ id, label }) => <button key={id} type="button" aria-pressed={category === id} onClick={() => filterProjects(id)}>{label}</button>)}</div>
+          <div className="project-filters" role="group" aria-label="Filter projects" data-sound="project">{projectCategories.map(({ id, label }) => <button key={id} type="button" aria-label={label} aria-pressed={category === id} onClick={() => filterProjects(id)}>{label}</button>)}</div>
           <p className="project-count" aria-live="polite">{visible.length} {visible.length === 1 ? 'project' : 'projects'}</p>
         </div>
         <div className="project-showcase" role="region" aria-roledescription="carousel" aria-label="Project showcase" data-reveal style={{ '--reveal-delay': '120ms' }}>
@@ -116,6 +125,12 @@ const Project = () => {
       </div>
     </section>
   );
+};
+
+const Project = () => {
+  const mobile = useMobileLayout();
+  const [category, setCategory] = useState('all');
+  return mobile ? <MobileProjects category={category} onCategoryChange={setCategory} /> : <DesktopProject category={category} setCategory={setCategory} />;
 };
 
 export default Project;

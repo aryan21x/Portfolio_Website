@@ -1,9 +1,11 @@
 import { act } from 'react';
-import { fireEvent, render } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import Experience from './Experience';
 import { interfaceSounds } from '../utils/interfaceSounds';
+import { experiences } from '../data/portfolio';
 
-const descriptors = ['scrollY', 'innerHeight'].map((key) => [key, Object.getOwnPropertyDescriptor(window, key)]);
+const descriptors = ['scrollY', 'innerHeight', 'innerWidth'].map((key) => [key, Object.getOwnPropertyDescriptor(window, key)]);
 const setValue = (object, key, value) => Object.defineProperty(object, key, { configurable: true, value });
 let sound;
 
@@ -69,4 +71,50 @@ test('stays quiet outside the timeline and during resizing, and removes scroll l
   unmount();
   scrollTo(600);
   expect(sound).not.toHaveBeenCalled();
+});
+
+test('starts all three mobile experiences closed and toggles each independently', () => {
+  setValue(window, 'innerWidth', 390);
+  const { container } = render(<Experience />);
+  const panels = [...container.querySelectorAll('.mobile-disclosure-panel')];
+  expect(panels).toHaveLength(3);
+  panels.forEach((panel) => expect(panel).not.toBeVisible());
+  const first = screen.getByRole('button', { name: 'C-lock Inc.', exact: true });
+  const second = screen.getByRole('button', { name: 'Caterpillar', exact: true });
+  expect(first).toHaveAttribute('aria-expanded', 'false');
+  fireEvent.click(first);
+  expect(first).toHaveAttribute('aria-expanded', 'true');
+  expect(first).toHaveAttribute('aria-controls', panels[0].id);
+  expect(panels[0]).toBeVisible();
+  expect(panels[1]).not.toBeVisible();
+  fireEvent.click(second);
+  expect(panels[0]).toBeVisible();
+  expect(panels[1]).toBeVisible();
+  fireEvent.click(first);
+  expect(panels[0]).not.toBeVisible();
+  expect(panels[1]).toBeVisible();
+});
+
+test('shows every experience on desktop even when the mobile cards are closed', () => {
+  setValue(window, 'innerWidth', 390);
+  const { container } = render(<Experience />);
+  setValue(window, 'innerWidth', 1440);
+  fireEvent.resize(window);
+  expect(container.querySelectorAll('.mobile-disclosure-trigger')).toHaveLength(0);
+  container.querySelectorAll('.mobile-disclosure-panel').forEach((panel) => expect(panel).toBeVisible());
+  setValue(window, 'innerWidth', 390);
+  fireEvent.resize(window);
+  container.querySelectorAll('.mobile-disclosure-panel').forEach((panel) => expect(panel).not.toBeVisible());
+});
+
+test('shows exact resume bullets on phones and lets readers close details from the bottom', () => {
+  setValue(window, 'innerWidth', 390);
+  const { container } = render(<Experience />);
+  const trigger = screen.getByRole('button', { name: 'C-lock Inc.', exact: true });
+  fireEvent.click(trigger);
+  expect([...container.querySelector('.experience-highlights').children].map((item) => item.textContent)).toEqual(experiences[0].highlights);
+  fireEvent.click(screen.getByRole('button', { name: 'Close details', exact: true }));
+  expect(trigger).toHaveFocus();
+  expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  expect(container.querySelector('.mobile-disclosure-panel')).not.toBeVisible();
 });

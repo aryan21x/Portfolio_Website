@@ -6,8 +6,12 @@ import { interfaceSounds } from '../utils/interfaceSounds';
 const butterflies = [1, 0.78, 0.64, 0.88, 0.54, 0.72, 0.94, 0.6, 0.82, 0.68, 0.9, 0.56, 0.76, 0.62, 0.84, 0.7, 0.86, 0.58, 0.74, 0.66].map((scale, index) => ({
   scale, flutter: (0.85 + index % 4 * 0.15) + 's', delay: (-index * 0.17) + 's',
 }));
-const highlightSelector = '[data-butterfly-perch], #about-title, .experience-node, .experience-content h3, .skill-group > h3, .project-card.is-active .project-preview, .project-card.is-active .project-cover, .project-card.is-active h3';
-const protectedSelector = '.banner-copy, .about-copy, .experience-meta, .experience-content, .skill-list, .skill-group > h3, .section-heading h2, .project-card.is-active .project-body, .project-toolbar, .project-carousel-controls';
+const highlightSelector = '[data-butterfly-perch], #about-title, .experience-node, .experience-content h3, .skill-group h3, .project-card.is-active .project-preview, .project-card.is-active .project-cover, .project-card.is-active h3';
+const mobileHighlightSelector = highlightSelector + ', .experience-date, .experience-technologies > li, .experience-location, .mobile-work-date, .mobile-work-location';
+const protectedSelector = '[data-butterfly-avoid], .banner-copy, .about-copy, .about-credentials, .experience-meta, .experience-content, .skill-list, .skill-group h3, .section-heading h2, .project-mobile-filter, .project-filter-menu, .project-mobile-category, .project-card.is-active .project-body, .project-toolbar, .project-carousel-controls';
+// Protect the actual labels and chips on phones, leaving empty card space and
+// the gaps around metadata available for flight.
+const mobileProtectedSelector = '[data-butterfly-avoid], .banner-copy, .about-copy > h2, .about-copy > p, .education-note, .award-note, .about-gpa, .resume-link, .experience-date, .experience-location, .experience-technologies > li, .experience-heading h3 > span, .experience-role > span, .experience-highlights > li, .disclosure-chevron, .skill-group h3 > span, .skill-list > li, .section-heading h2, .section-heading > p, .project-mobile-filter, .project-filter-menu, .project-mobile-category, .project-card.is-active .project-category, .project-card.is-active h3, .project-card.is-active .project-description, .project-card.is-active .tag-list > li, .project-card.is-active .project-links, .project-card.is-active .project-cover > p, .project-carousel-controls';
 const ease = (value) => { const t = Math.min(1, Math.max(0, value)); return t * t * (3 - 2 * t); };
 
 // Ignore reveal transforms, but account for the project carousel's scroll offset.
@@ -17,6 +21,29 @@ const layoutBox = (element) => {
   for (let node = element; node; node = node.offsetParent) { x += node.offsetLeft; y += node.offsetTop; }
   for (let node = element.parentElement; node && node !== document.body; node = node.parentElement) { x -= node.scrollLeft; y -= node.scrollTop; }
   return { x, y, width: element.offsetWidth, height: element.offsetHeight };
+};
+
+const mobileTextBoxes = (element) => {
+  const box = layoutBox(element);
+  let lines = [];
+  if (element.matches('h3 > span, .experience-role > span')) lines = Array.from(element.getClientRects());
+  else if (element.matches('.section-heading > p')) {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    lines = Array.from(range.getClientRects?.() || []);
+  }
+  if (!lines.length) return [box];
+  const visible = element.getBoundingClientRect();
+  const scaleX = visible.width ? box.width / visible.width : 1;
+  const scaleY = visible.height ? box.height / visible.height : 1;
+  // Use individual text lines so the blank side of a wrapped label stays open.
+  // Translate back to stable layout coordinates while reveal transforms run.
+  return lines.map((line) => ({
+    x: box.x + (line.left - visible.left) * scaleX,
+    y: box.y + (line.top - visible.top) * scaleY,
+    width: line.width * scaleX,
+    height: line.height * scaleY,
+  }));
 };
 
 const ButterflyFollower = () => {
@@ -49,7 +76,18 @@ const ButterflyFollower = () => {
     let clock = 0;
     let transition = null;
     let heroAppearance = { opacity: 1, scale: 1 };
-    const smallSize = () => viewport.width < 768 ? 36 : viewport.width >= 1600 ? 64 : 54;
+    const smallSize = () => viewport.width < 768 ? 24 : viewport.width >= 1600 ? 64 : 54;
+    const flyerSize = (bird) => viewport.width < 768 ? Math.round(18 + bird.scale * 6) : Math.round(smallSize() * bird.scale);
+    const flightDuration = (state, goal) => {
+      if (viewport.width >= 768) return goal.duration;
+      let previous = state;
+      const length = (goal.path || []).reduce((total, point) => {
+        const distance = Math.hypot(point.x - previous.x, point.y - previous.y);
+        previous = point;
+        return total + distance;
+      }, 0);
+      return Math.max(goal.duration, length / (state.speed * 0.7) * 1000 + 1500);
+    };
     const setHeroAppearance = (opacity, scale) => {
       heroAppearance = { opacity, scale };
       root.style.setProperty('--butterfly-hero-opacity', opacity);
@@ -78,14 +116,17 @@ const ButterflyFollower = () => {
       const sections = Array.from(root.querySelectorAll('main > section'));
       const lastSection = sections[sections.length - 1] || root.querySelector('#projects');
       const contentBox = lastSection && layoutBox(lastSection);
+      const width = document.documentElement.clientWidth || window.innerWidth;
       viewport = {
-        width: document.documentElement.clientWidth || window.innerWidth,
+        width,
         height: window.innerHeight,
         headerHeight: root.querySelector('.site-header')?.offsetHeight || 64,
         scrollY: window.scrollY,
         contentBottom: contentBox ? contentBox.y + contentBox.height : Infinity,
-        obstacles: Array.from(root.querySelectorAll(protectedSelector)).map(layoutBox).filter((box) => box.width && box.height),
+        obstacles: Array.from(root.querySelectorAll(width < 768 ? mobileProtectedSelector : protectedSelector)).flatMap((element) => width < 768 ? mobileTextBoxes(element) : [layoutBox(element)]).filter((box) => box.width && box.height),
       };
+      // Clip at the content edge, including the desktop scrollbar gutter.
+      layer.style.width = viewport.width + 'px';
       const resized = previousViewport && (previousViewport.width !== viewport.width || previousViewport.height !== viewport.height);
       flock = butterflies.slice(0, butterflyCount(viewport.width));
       layer.dataset.count = flock.length;
@@ -93,17 +134,17 @@ const ButterflyFollower = () => {
       if (states && (resized || states.length !== flock.length)) {
         const previous = states;
         states = flock.map((bird, index) => previous[index] || {
-          ...previous[index % previous.length], width: Math.round(smallSize() * bird.scale), opacity: 0,
+          ...previous[index % previous.length], width: flyerSize(bird), opacity: 0,
           vx: (Math.random() - 0.5) * 30, vy: (Math.random() - 0.5) * 30,
         });
         goals = [];
         transition = null;
         setHeroAppearance(0, 0.18);
       }
-      anchors = Array.from(root.querySelectorAll(highlightSelector)).filter((element) => element.closest('section')).map((element) => {
+      anchors = Array.from(root.querySelectorAll(width < 768 ? mobileHighlightSelector : highlightSelector)).filter((element) => element.closest('section')).map((element) => {
         if (!anchorIds.has(element)) anchorIds.set(element, 'highlight-' + nextId++);
         const perch = element.dataset.butterflyPerch || element.closest('section').id;
-        const kind = perch === 'portrait' ? 'portrait' : element.matches('.experience-node') ? 'logo' : element.matches('.project-preview, .project-cover') ? 'picture' : 'heading';
+        const kind = perch === 'portrait' ? 'portrait' : element.matches('.experience-node') ? 'logo' : element.matches('.experience-date, .experience-technologies > li, .experience-location, .mobile-work-date, .mobile-work-location') ? 'detail' : element.matches('.project-preview, .project-cover') ? 'picture' : 'heading';
         return { id: anchorIds.get(element), perch, kind, box: layoutBox(element) };
       });
       // Long sections have open-space fallbacks, never navbar or footer targets.
@@ -128,7 +169,7 @@ const ButterflyFollower = () => {
       };
       if (!states) {
         states = flock.map((bird) => {
-          const width = smallSize() * bird.scale * 0.3;
+          const width = flyerSize(bird) * 0.3;
           return { x: origin.x - width / 2, y: origin.y - width / 2, width, vx: 0, vy: 0, bank: 0, opacity: 0, speed: (viewport.width < 768 ? 24 : 36) + Math.random() * 20 };
         });
         root.classList.add('butterfly-roaming');
@@ -140,7 +181,7 @@ const ButterflyFollower = () => {
         rays: inward ? states.map((state) => {
           const width = state.width * 0.25;
           return { path: planButterflyPath(state, { x: origin.x - width / 2, y: origin.y - width / 2 }, viewport, state.width) };
-        }) : createButterflyBurst(origin, viewport, flock.map((bird) => Math.round(smallSize() * bird.scale))),
+        }) : createButterflyBurst(origin, viewport, flock.map(flyerSize)),
       };
       goals = [];
       interfaceSounds.play(inward ? 'merge' : 'burst');
@@ -189,7 +230,8 @@ const ButterflyFollower = () => {
     const paint = (mode) => {
       states.forEach((state, index) => {
         const flyer = flyers[index];
-        flyer.style.transform = 'translate3d(' + state.x + 'px,' + state.y + 'px,0) rotate(' + state.bank + 'deg) scale(' + state.width / 100 + ')';
+        const bank = viewport.width < 768 ? Math.max(-4, Math.min(4, state.bank)) : state.bank;
+        flyer.style.transform = 'translate3d(' + state.x + 'px,' + state.y + 'px,0) rotate(' + bank + 'deg) scale(' + state.width / 100 + ')';
         const aboveFooter = state.y + state.width <= viewport.contentBottom - viewport.scrollY - 16;
         flyer.style.opacity = String((aboveFooter ? state.opacity : 0) * butterflyContentOpacity(state, viewport));
         flyer.classList.toggle('is-flying', mode !== 'home' && state.opacity > 0.05);
@@ -221,7 +263,7 @@ const ButterflyFollower = () => {
         if (!states) return;
       } else {
         states.forEach((state, index) => {
-          const size = Math.round(smallSize() * butterflies[index].scale);
+          const size = flyerSize(butterflies[index]);
           state.width += (size - state.width) * (1 - Math.exp(-seconds / 0.28));
           const bounds = butterflyBounds(viewport, state.width);
           if (bounds.visible) {
@@ -233,7 +275,7 @@ const ButterflyFollower = () => {
             if (!goal || clock > goal.until || (goal.anchorId && !visible.some(({ id }) => id === goal.anchorId)) || reached || butterflyContentOpacity(target, viewport, size) < 1) {
               goal = chooseButterflyTarget(anchors, viewport, size, goals.filter((other, otherIndex) => other && otherIndex !== index).map((other) => resolveButterflyTarget(other, anchors, viewport, size)), goal?.anchorId, Math.random, state);
               if (goal) {
-                goals[index] = { ...goal, started: clock, until: clock + goal.duration, routeScroll: viewport.scrollY, version: geometryVersion };
+                goals[index] = { ...goal, started: clock, until: clock + flightDuration(state, goal), routeScroll: viewport.scrollY, version: geometryVersion };
                 goal = goals[index];
                 target = resolveButterflyTarget(goal, anchors, viewport, size);
               }
@@ -242,6 +284,7 @@ const ButterflyFollower = () => {
               goal.path = planButterflyPath(state, target, viewport, size);
               goal.routeScroll = viewport.scrollY;
               goal.version = geometryVersion;
+              if (viewport.width < 768) goal.until = Math.max(goal.until, clock + flightDuration(state, goal));
             }
             if (!goal?.path?.length) {
               goals[index] = null;
@@ -251,7 +294,26 @@ const ButterflyFollower = () => {
               state.retryVersion = geometryVersion;
               return;
             }
-            while (goal.path.length > 1 && Math.hypot(state.x - goal.path[0].x, state.y - goal.path[0].y) < 6) goal.path.shift();
+            // If scrolling brought text over a phone flyer, move it to the
+            // first safe waypoint while hidden, then fade it back into flight.
+            if (viewport.width < 768 && butterflyContentOpacity(state, viewport) === 0
+              && butterflyContentOpacity(goal.path[0], viewport, state.width) === 1) {
+              state.x = goal.path[0].x;
+              state.y = goal.path[0].y;
+              state.vx = 0;
+              state.vy = 0;
+              state.opacity = 0;
+            }
+            while (goal.path.length > 1 && Math.hypot(state.x - goal.path[0].x, state.y - goal.path[0].y) < 6) {
+              if (viewport.width < 768) {
+                // Reach a tight corner before turning around the next label.
+                state.x = goal.path[0].x;
+                state.y = goal.path[0].y;
+                state.vx *= 0.3;
+                state.vy *= 0.3;
+              }
+              goal.path.shift();
+            }
             const moved = advanceButterfly(state, goal.path[0], seconds, bounds, state.speed, states.filter((other, otherIndex) => otherIndex !== index), viewport);
             state.x = moved.x;
             state.y = moved.y;
@@ -291,8 +353,9 @@ const ButterflyFollower = () => {
     observer?.observe(root);
     observer?.observe(hero);
     const projects = root.querySelector('#projects');
-    const mutations = projects && typeof window.MutationObserver === 'function' ? new window.MutationObserver(refresh) : null;
-    mutations?.observe(projects, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+    const mutations = typeof window.MutationObserver === 'function' ? new window.MutationObserver(refresh) : null;
+    if (projects) mutations?.observe(projects, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+    root.querySelectorAll('.mobile-disclosure-panel').forEach((panel) => mutations?.observe(panel, { attributes: true, attributeFilter: ['hidden'] }));
     projects?.addEventListener('scroll', refresh, true);
     hero.addEventListener('load', refresh);
     window.addEventListener('scroll', schedule, { passive: true });

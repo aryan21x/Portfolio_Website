@@ -1,4 +1,4 @@
-const cooldowns = { click: 0.07, typing: 0.04, navigation: 0.1, action: 0.12, project: 0.16, experience: 0.28, skills: 0.24, burst: 0.3, merge: 0.3 };
+const cooldowns = { click: 0.07, typing: 0.04, navigation: 0.1, action: 0.12, project: 0.16, experience: 0.28, burst: 0.3, merge: 0.3 };
 const effectsVolume = 0.715;
 
 const browserContext = () => {
@@ -13,6 +13,8 @@ export function createInterfaceSounds(makeContext = browserContext) {
   let output = null;
   let noiseBuffer = null;
   let resumeRequest = null;
+  let playbackSession = null;
+  let previousSessionType = null;
   let reportedStatus = 'muted';
   const listeners = new Set();
   const lastPlayed = new Map();
@@ -43,6 +45,29 @@ export function createInterfaceSounds(makeContext = browserContext) {
     });
   };
 
+  const restoreAudioSession = () => {
+    try {
+      if (playbackSession?.type === 'playback') playbackSession.type = previousSessionType;
+    } catch { /* Audio Session is optional and may be restricted by the browser. */ }
+    playbackSession = null;
+    previousSessionType = null;
+  };
+
+  const configurePlaybackSession = () => {
+    try {
+      const session = typeof navigator !== 'undefined' ? navigator.audioSession : null;
+      if (!session) return;
+      if (session !== playbackSession) {
+        restoreAudioSession();
+        previousSessionType = session.type;
+        playbackSession = session;
+      }
+      // iPhone's default ambient session obeys the ringer's Silent Mode even
+      // when AudioContext.state is running. Explicitly enabled effects use media playback.
+      if (session.type !== 'playback') session.type = 'playback';
+    } catch { /* Keep ordinary Web Audio working where this API is unavailable. */ }
+  };
+
   const setEnabled = (value) => {
     enabled = value;
     notify();
@@ -50,6 +75,7 @@ export function createInterfaceSounds(makeContext = browserContext) {
       lastPlayed.clear();
       if (output) output.gain.setValueAtTime(0, context.currentTime);
       stopVoices();
+      restoreAudioSession();
       const mutedContext = context;
       mutedContext?.suspend?.().then(() => {
         // A fast off/on click may arrive before suspension finishes.
@@ -64,11 +90,15 @@ export function createInterfaceSounds(makeContext = browserContext) {
   const unlock = ({ retry = false } = {}) => {
     if (!enabled) return false;
     try {
+      configurePlaybackSession();
       if (!context || context.state === 'closed') {
         stopVoices();
         context?.removeEventListener?.('statechange', notify);
         context = makeContext();
-        if (!context) return false;
+        if (!context) {
+          restoreAudioSession();
+          return false;
+        }
         context.addEventListener?.('statechange', notify);
         resumeRequest = null;
         output = context.createGain();
@@ -93,6 +123,7 @@ export function createInterfaceSounds(makeContext = browserContext) {
       context = null;
       output = null;
       resumeRequest = null;
+      restoreAudioSession();
       notify();
       return false;
     }
@@ -168,10 +199,6 @@ export function createInterfaceSounds(makeContext = browserContext) {
       if (name === 'experience') {
         tone(now, 0.16, 880, 1046, 0.047, 'experience');
         tone(now + 0.045, 0.12, 1318, 1318, 0.027, 'experience');
-      }
-      if (name === 'skills') {
-        whoosh(now, 0.16, 1300, 2600, 0.065, 0.02, 'skills');
-        tone(now + 0.025, 0.18, 1046, 1568, 0.043, 'skills');
       }
       if (name === 'burst') {
         whoosh(now, 0.42, 3000, 650, 0.09, 0.025, 'butterfly');

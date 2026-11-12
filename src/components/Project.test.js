@@ -5,6 +5,7 @@ import Project from './Project';
 import { interfaceSounds } from '../utils/interfaceSounds';
 
 let sound;
+const widthDescriptor = Object.getOwnPropertyDescriptor(window, 'innerWidth');
 
 beforeEach(() => {
   jest.useFakeTimers();
@@ -14,6 +15,7 @@ beforeEach(() => {
 afterEach(() => {
   jest.useRealTimers();
   jest.restoreAllMocks();
+  if (widthDescriptor) Object.defineProperty(window, 'innerWidth', widthDescriptor);
 });
 
 const setup = () => {
@@ -86,4 +88,36 @@ test('removes the resize alignment listener when unmounted', () => {
   track.scrollLeft = 0;
   fireEvent.resize(window);
   expect(track.scrollLeft).toBe(0);
+});
+
+const setWidth = (value) => Object.defineProperty(window, 'innerWidth', { configurable: true, value });
+
+test('keeps the chosen category when moving between phone and desktop layouts', () => {
+  setWidth(390);
+  render(<Project />);
+  fireEvent.click(screen.getByRole('button', { name: 'Filter projects' }));
+  fireEvent.click(screen.getByRole('menuitemradio', { name: 'Machine learning' }));
+  expect(screen.getAllByRole('button', { name: /^View .+ project details$/ })).toHaveLength(2);
+  setWidth(1440);
+  fireEvent.resize(window);
+  expect(screen.getByLabelText(/Project slides/)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Machine learning', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  setWidth(390);
+  fireEvent.resize(window);
+  fireEvent.click(screen.getByRole('button', { name: 'Filter projects' }));
+  expect(screen.getByRole('menuitemradio', { name: 'Machine learning' })).toHaveAttribute('aria-checked', 'true');
+});
+
+test('closes phone project details and releases the page when switching to desktop', () => {
+  setWidth(390);
+  render(<Project />);
+  fireEvent.click(screen.getByRole('button', { name: 'View NanoAFM project details' }));
+  expect(screen.getByRole('dialog', { name: 'NanoAFM' })).toBeInTheDocument();
+  expect(document.body).toHaveClass('modal-open');
+  setWidth(1440);
+  fireEvent.resize(window);
+  expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  expect(document.body).not.toHaveClass('modal-open');
+  expect(document.body.style.overflow).toBe('');
+  expect(screen.getByLabelText(/Project slides/)).toBeInTheDocument();
 });
